@@ -36,7 +36,7 @@ export default function SongList({ onSongSelect, playingSongId, isPlaying, toggl
     };
 
     const handleImageClick = (songId: number) => {
-        onSongSelect(songId); // Select the song or toggle play/pause
+        onSongSelect(songId);
     };
 
     if (songs.length === 0) {
@@ -62,7 +62,6 @@ export default function SongList({ onSongSelect, playingSongId, isPlaying, toggl
                                     style={{ width: 80, height: 80, cursor: 'pointer' }}
                                     onClick={() => handleImageClick(song.id)}
                                 />
-                                {/* Play/Pause Icon on Hover */}
                                 {hoveredSongId === song.id && (
                                     <IconButton
                                         style={{

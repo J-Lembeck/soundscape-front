@@ -24,16 +24,14 @@ export default function Home() {
     const playerRef = useRef<{ togglePlayPause: () => void } | null>(null);
 
     useEffect(() => {
-        // Load all songs on component mount
         const fetchSongs = async () => {
             try {
-                const response = await api.get<SongDetails[]>('/songs/listAll');
+                const response = await api.get<SongDetails[]>('/songs/load/listAll');
                 const backendUrl = process.env.REACT_APP_API_URL;
 
-                // Add full image URL to each song
                 const songsWithImageUrl = response.data.map((song) => ({
                     ...song,
-                    imageUrl: `${backendUrl}/songs/image?id=${song.id}`
+                    imageUrl: `${backendUrl}/songs/load/image?id=${song.id}`
                 }));
 
                 setSongs(songsWithImageUrl);
@@ -51,7 +49,7 @@ export default function Home() {
         } else {
             setSelectedSongId(songId);
             setIsPlaying(true);
-            const selectedSong = songs.find((song) => song.id === songId); // Find the selected song from the list
+            const selectedSong = songs.find((song) => song.id === songId);
             setCurrentSong(selectedSong || null);
         }
     };
@@ -71,13 +69,13 @@ export default function Home() {
                 playingSongId={selectedSongId}
                 isPlaying={isPlaying}
                 togglePlayPause={handleTogglePlayPause}
-                songs={songs} // Pass songs list to SongList component
+                songs={songs}
             />
             <Player 
                 ref={playerRef} 
                 songId={selectedSongId} 
                 setIsPlaying={setIsPlaying} 
-                currentSong={currentSong} // Pass the current song to Player
+                currentSong={currentSong}
             />
             <UploadFile />
         </>
