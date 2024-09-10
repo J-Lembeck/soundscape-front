@@ -1,83 +1,75 @@
-import React, { useState, useRef, useEffect } from 'react';
-import Menu from "../../components/menu/Menu";
-import Player from "../../components/player/Player";
+import React, { useEffect } from 'react';
 import SongList from "../../components/songList/SongList";
-import UploadFile from "../../components/uploadFile/UploadFile";
 import api from '../../services/api';
 
 interface SongDetails {
+  id: number;
+  title: string;
+  artist: {
     id: number;
-    title: string;
-    artist: {
-        id: number;
-        name: string;
-    };
-    length: number;
-    imageUrl: string;
+    name: string;
+  };
+  length: number;
+  imageUrl: string;
 }
 
-export default function Home() {
-    const [selectedSongId, setSelectedSongId] = useState<number | undefined>(undefined);
-    const [isPlaying, setIsPlaying] = useState<boolean>(false);
-    const [currentSong, setCurrentSong] = useState<SongDetails | null>(null);
-    const [songs, setSongs] = useState<SongDetails[]>([]);
-    const playerRef = useRef<{ togglePlayPause: () => void } | null>(null);
+interface HomeProps {
+  setSelectedSongId: React.Dispatch<React.SetStateAction<number | undefined>>;
+  setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
+  setCurrentSong: React.Dispatch<React.SetStateAction<SongDetails | null>>;
+  handleTogglePlayPause: () => void;
+  isPlaying: boolean;
+  selectedSongId: number | undefined;
+}
 
-    useEffect(() => {
-        const fetchSongs = async () => {
-            try {
-                const response = await api.get<SongDetails[]>('/songs/load/listAll');
-                const backendUrl = process.env.REACT_APP_API_URL;
+export default function Home({
+  setSelectedSongId,
+  setIsPlaying,
+  setCurrentSong,
+  handleTogglePlayPause,
+  isPlaying,
+  selectedSongId,
+}: HomeProps) {
+  const [songs, setSongs] = React.useState<SongDetails[]>([]);
 
-                const songsWithImageUrl = response.data.map((song) => ({
-                    ...song,
-                    imageUrl: `${backendUrl}/songs/load/image?id=${song.id}`
-                }));
+  useEffect(() => {
+    const fetchSongs = async () => {
+      try {
+        const response = await api.get<SongDetails[]>('/songs/load/listAll');
+        const backendUrl = process.env.REACT_APP_API_URL;
 
-                setSongs(songsWithImageUrl);
-            } catch (error) {
-                console.error('Failed to fetch songs', error);
-            }
-        };
+        const songsWithImageUrl = response.data.map((song) => ({
+          ...song,
+          imageUrl: `${backendUrl}/songs/load/image?id=${song.id}`
+        }));
 
-        fetchSongs();
-    }, []);
-
-    const handleSongSelect = (songId: number) => {
-        if (selectedSongId === songId) {
-            handleTogglePlayPause();
-        } else {
-            setSelectedSongId(songId);
-            setIsPlaying(true);
-            const selectedSong = songs.find((song) => song.id === songId);
-            setCurrentSong(selectedSong || null);
-        }
+        setSongs(songsWithImageUrl);
+      } catch (error) {
+        console.error('Failed to fetch songs', error);
+      }
     };
 
-    const handleTogglePlayPause = () => {
-        if (playerRef.current) {
-            playerRef.current.togglePlayPause();
-            setIsPlaying(!isPlaying);
-        }
-    };
+    fetchSongs();
+  }, []);
 
-    return (
-        <>
-            <Menu />
-            <SongList
-                onSongSelect={handleSongSelect}
-                playingSongId={selectedSongId}
-                isPlaying={isPlaying}
-                togglePlayPause={handleTogglePlayPause}
-                songs={songs}
-            />
-            <Player 
-                ref={playerRef} 
-                songId={selectedSongId} 
-                setIsPlaying={setIsPlaying} 
-                currentSong={currentSong}
-            />
-            <UploadFile />
-        </>
-    );
+  const handleSongSelect = (songId: number) => {
+    if (selectedSongId === songId) {
+      handleTogglePlayPause();
+    } else {
+      setSelectedSongId(songId);
+      setIsPlaying(true);
+      const selectedSong = songs.find((song) => song.id === songId);
+      setCurrentSong(selectedSong || null);
+    }
+  };
+
+  return (
+    <SongList
+      onSongSelect={handleSongSelect}
+      playingSongId={selectedSongId}
+      isPlaying={isPlaying}
+      togglePlayPause={handleTogglePlayPause}
+      songs={songs}
+    />
+  );
 }

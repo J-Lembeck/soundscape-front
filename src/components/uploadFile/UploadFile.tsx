@@ -5,7 +5,7 @@ import api from '../../services/api';
 export default function UploadFile() {
     const [title, setTitle] = useState<string>('');
     const [audioFile, setAudioFile] = useState<File | null>(null);
-    const [imageFile, setImageFile] = useState<File | null>(null); // New state for image file
+    const [imageFile, setImageFile] = useState<File | null>(null);
 
     const handleAudioFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files) {
@@ -15,7 +15,7 @@ export default function UploadFile() {
 
     const handleImageFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files) {
-            setImageFile(event.target.files[0]); // Set the image file
+            setImageFile(event.target.files[0]);
         }
     };
 
@@ -29,7 +29,7 @@ export default function UploadFile() {
         formData.append('title', title);
         formData.append('artistId', '1');
         formData.append('audioFile', audioFile);
-        formData.append('imageFile', imageFile); // Append image file
+        formData.append('imageFile', imageFile);
 
         try {
             const response = await api.post('/songs/upload', formData);
@@ -58,7 +58,7 @@ export default function UploadFile() {
             </Button>
             <Button variant="contained" component="label" fullWidth>
                 Upload Image File
-                <input type="file" hidden accept="image/*" onChange={handleImageFileChange} /> {/* Input for image file */}
+                <input type="file" hidden accept="image/*" onChange={handleImageFileChange} />
             </Button>
             <Button variant="contained" color="primary" onClick={handleUpload} fullWidth>
                 Submit

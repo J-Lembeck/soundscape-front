@@ -200,7 +200,6 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong }: PlayerProps, r
         >
             <audio ref={audioPlayerRef} />
 
-            {/* Display current song information */}
             {currentSong && (
                 <Box display="flex" alignItems="center">
                     <img
@@ -215,7 +214,6 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong }: PlayerProps, r
                 </Box>
             )}
 
-            {/* Media controls */}
             <Box display="flex" flexDirection="column" alignItems="center">
                 <IconButton onClick={togglePlayPause} aria-label="play-pause">
                     {isPlaying ? <PauseCircleFilled fontSize="large" /> : <PlayCircleFilled fontSize="large" />}
@@ -228,14 +226,13 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong }: PlayerProps, r
                         max={duration}
                         onChange={handleSliderChange}
                         aria-labelledby="audio-slider"
-                        sx={{ width: 500, mx: 2 }} // Adjusted width
+                        sx={{ width: 500, mx: 2 }}
                     />
                     <Typography variant="caption">{`${Math.floor(duration / 60)}:${(duration % 60).toFixed(0).padStart(2, '0')}`}</Typography>
                 </Box>
                 
             </Box>
 
-            {/* Volume and favorite controls */}
             <Box display="flex" alignItems="center">
                 <IconButton>
                     <FavoriteBorderIcon />
