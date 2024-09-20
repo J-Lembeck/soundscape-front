@@ -1,25 +1,9 @@
 import React, { useState, useRef, useEffect, useImperativeHandle, forwardRef } from 'react';
 import { Slider, Typography, IconButton, Box } from '@mui/material';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import PauseIcon from '@mui/icons-material/Pause';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import { PauseCircleFilled, PlayCircleFilled } from '@mui/icons-material';
-
-interface PlayerProps {
-    songId?: number;
-    setIsPlaying: (isPlaying: boolean) => void;
-    currentSong: {
-        id: number;
-        title: string;
-        artist: {
-            id: number;
-            name: string;
-        };
-        length: number;
-        imageUrl: string;
-    } | null;
-}
+import { Album, MusicNote, PauseCircleFilled, PlayCircleFilled } from '@mui/icons-material';
+import { PlayerProps } from './IPlayer';
 
 const Player = forwardRef(({ songId, setIsPlaying, currentSong }: PlayerProps, ref) => {
     const [duration, setDuration] = useState<number>(0);
@@ -190,33 +174,44 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong }: PlayerProps, r
                 bottom: 0,
                 left: 0,
                 right: 0,
-                backgroundColor: '#F3F2F7',
+                backgroundColor: '#F4EFFA',
                 padding: '10px 20px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                borderTop: '1px solid #ddd',
+                width: "100%"
             }}
         >
             <audio ref={audioPlayerRef} />
 
-            {currentSong && (
-                <Box display="flex" alignItems="center">
-                    <img
-                        src={currentSong.imageUrl}
-                        alt="Song cover"
-                        style={{ width: 70, height: 70, borderRadius: 4, marginRight: 16 }}
-                    />
-                    <Box>
-                        <Typography variant="subtitle2">{currentSong.title}</Typography>
-                        <Typography variant="body2" color="textSecondary">{currentSong.artist.name}</Typography>
+            {currentSong ? (
+                    <Box display="flex" alignItems="center">
+                        <img
+                            src={currentSong.imageUrl}
+                            alt="Song cover"
+                            style={{ 
+                                width: 90, 
+                                height: 90, 
+                                borderRadius: 4, 
+                                marginRight: 16, 
+                                objectFit: 'cover'  // Add this line to prevent stretching
+                            }}
+                        />
+                        <Box>
+                            <Typography variant="subtitle2">{currentSong.title}</Typography>
+                            <Typography variant="body2" color="textSecondary">{currentSong.artist.name}</Typography>
+                        </Box>
                     </Box>
-                </Box>
-            )}
+                ) : (
+                    <Box display="flex" alignItems="center" justifyContent={"center"} style={{ width: 70, height: 70, borderRadius: 4, marginRight: 16, backgroundColor: "#ADB5BD" }}>
+                        <Album style={{ width: 40, height: 40, color: "#FBFAFF" }}/>   
+                    </Box>
+                )
+            }
 
             <Box display="flex" flexDirection="column" alignItems="center">
-                <IconButton onClick={togglePlayPause} aria-label="play-pause">
-                    {isPlaying ? <PauseCircleFilled fontSize="large" /> : <PlayCircleFilled fontSize="large" />}
+                <IconButton onClick={togglePlayPause} aria-label="play-pause" disabled={!currentSong}>
+                    {isPlaying ? <PauseCircleFilled fontSize="large" style={{width: 50, height: 50, color: "#2F184B"}} /> : <PlayCircleFilled fontSize="large" style={{width: 50, height: 50, color: "#2F184B"}} />}
                 </IconButton>
                 <Box display="flex" alignItems="center">
                     <Typography variant="caption">{`${Math.floor(currentTime / 60)}:${(currentTime % 60).toFixed(0).padStart(2, '0')}`}</Typography>
@@ -235,10 +230,10 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong }: PlayerProps, r
 
             <Box display="flex" alignItems="center">
                 <IconButton>
-                    <FavoriteBorderIcon />
+                    <FavoriteBorderIcon style={{color: "#2F184B"}}/>
                 </IconButton>
                 <IconButton>
-                    <VolumeUpIcon />
+                    <VolumeUpIcon style={{color: "#2F184B"}}/>
                 </IconButton>
                 <Slider
                     value={volume}

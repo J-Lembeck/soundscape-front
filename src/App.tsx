@@ -1,83 +1,175 @@
-import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import Login from './pages/login/Login';
-import Home from './pages/home/Home';
 import Menu from "./components/menu/Menu";
 import Player from "./components/player/Player";
 import UploadFile from './components/uploadFile/UploadFile';
 import Sidebar from './components/sideBar/Sidebar';
 import ProtectedRoute from './components/protectedRoute/ProtectedRoute';
-
-interface SongDetails {
-  id: number;
-  title: string;
-  artist: {
-    id: number;
-    name: string;
-  };
-  length: number;
-  imageUrl: string;
-}
+import SongList from './components/songList/SongList';
+import api from './services/api';
+import { PlaylistDetails } from './components/sideBar/ISidebar';
+import SongDetails from './components/songList/ISongList';
 
 function App() {
-  const [selectedSongId, setSelectedSongId] = useState<number | undefined>(undefined);
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [currentSong, setCurrentSong] = useState<SongDetails | null>(null);
-  const playerRef = useRef<{ togglePlayPause: () => void } | null>(null);
-  const location = useLocation();
+    const [selectedSongId, setSelectedSongId] = useState<number | undefined>(undefined);
+    const [isPlaying, setIsPlaying] = useState<boolean>(false);
+    const [currentSong, setCurrentSong] = useState<SongDetails | null>(null);
+    const [playlists, setPlaylists] = useState<PlaylistDetails[]>([]);
+    const [songs, setSongs] = useState<SongDetails[]>([]);
+    const playerRef = useRef<{ togglePlayPause: () => void } | null>(null);
+    const location = useLocation();
+    const navigate = useNavigate();
 
-  const handleTogglePlayPause = () => {
-    if (playerRef.current) {
-      playerRef.current.togglePlayPause();
-      setIsPlaying(!isPlaying);
-    }
-  };
+    const fetchSongs = async () => {
+        try {
+            const response = await api.get<SongDetails[]>('/songs/load/listAll');
+            const backendUrl = process.env.REACT_APP_API_URL;
 
-  const shouldShowComponents = location.pathname !== '/';
+            const songsWithImageUrl = response.data.map((song) => ({
+                ...song,
+                imageUrl: `${backendUrl}/songs/load/image?id=${song.id}`
+            }));
 
-  return (
-    <div>
-      {shouldShowComponents && <Sidebar />}
-      {shouldShowComponents && <Menu />}
-      {shouldShowComponents && (
-        <Player
-          ref={playerRef}
-          songId={selectedSongId}
-          setIsPlaying={setIsPlaying}
-          currentSong={currentSong}
-        />
-      )}
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/home" element={
-          <Home
-            setSelectedSongId={setSelectedSongId}
-            setIsPlaying={setIsPlaying}
-            setCurrentSong={setCurrentSong}
-            handleTogglePlayPause={handleTogglePlayPause}
-            isPlaying={isPlaying}
-            selectedSongId={selectedSongId}
-          />
-        } />
-        <Route
-          path="/upload"
-          element={
-            <ProtectedRoute>
-              <UploadFile />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
-    </div>
-  );
+            setSongs(songsWithImageUrl);
+        } catch (error) {
+            console.error('Failed to fetch songs', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchSongs();
+    }, []);
+
+    useEffect(() => {
+        if (location.pathname === '/home') {
+            fetchSongs();
+        }
+    }, [location.pathname]);
+
+    const handleSongSelect = (songId: number) => {
+        if (selectedSongId === songId) {
+            handleTogglePlayPause();
+        } else {
+            setSelectedSongId(songId);
+            setIsPlaying(true);
+            const selectedSong = songs.find((song) => song.id === songId);
+            setCurrentSong(selectedSong || null);
+        }
+    };
+
+    useEffect(() => {
+        const fetchPlaylists = async () => {
+            try {
+                const response = await api.get<PlaylistDetails[]>('/playlist/findAllByLoggedUser');
+                setPlaylists(response.data);
+            } catch (error) {
+                console.error('Failed to fetch playlists', error);
+            }
+        };
+
+        fetchPlaylists();
+    }, []);
+
+    const fetchSongsFromPlaylist = async (playlistId: number | string | undefined) => {
+        if(playlistId) {
+            try {
+                const response = await api.get<SongDetails[]>(`/playlist/findSongsFromPlaylist?playlistId=${playlistId}`);
+                const backendUrl = process.env.REACT_APP_API_URL;
+    
+                const songsWithImageUrl = response.data.map((song) => ({
+                    ...song,
+                    imageUrl: `${backendUrl}/songs/load/image?id=${song.id}`
+                }));
+    
+                setSongs(songsWithImageUrl);            
+            } catch (error) {
+                console.error('Failed to fetch songs from playlist', error);
+            }
+        }
+    };
+
+    const handleTogglePlayPause = () => {
+        if (playerRef.current) {
+            playerRef.current.togglePlayPause();
+            setIsPlaying(!isPlaying);
+        }
+    };
+
+    const handlePlaylistSelect = (playlistId: number) => {
+        fetchSongsFromPlaylist(playlistId);
+        navigate(`/playlist/${playlistId}`);
+    };
+
+    const shouldShowComponents = location.pathname !== '/';
+
+    return (
+        <div style={{ display: 'flex', height: '100vh' }}>
+            {shouldShowComponents && <Sidebar onPlaylistSelect={handlePlaylistSelect} />}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                {shouldShowComponents && <Menu />}
+                <div style={{ flex: 1 }}>
+                    <Routes>
+                        <Route path="/" element={<Login />} />
+                        <Route
+                            path="/home"
+                            element={
+                                <SongList
+                                    onSongSelect={handleSongSelect}
+                                    playingSongId={selectedSongId}
+                                    isPlaying={isPlaying}
+                                    togglePlayPause={handleTogglePlayPause}
+                                    songs={songs}
+                                    playlists={playlists}
+                                    isPlaylist={false}
+                                    fetchSongsFromPlaylist={fetchSongsFromPlaylist}
+                                />
+                            }
+                        />
+                        <Route
+                            path="/playlist/:id"
+                            element={
+                                <SongList
+                                    onSongSelect={handleSongSelect}
+                                    playingSongId={selectedSongId}
+                                    isPlaying={isPlaying}
+                                    togglePlayPause={handleTogglePlayPause}
+                                    songs={songs}
+                                    playlists={playlists}
+                                    isPlaylist={true}
+                                    fetchSongsFromPlaylist={fetchSongsFromPlaylist}
+                                />
+                            }
+                        />
+                        <Route
+                            path="/upload"
+                            element={
+                                <ProtectedRoute>
+                                    <UploadFile />
+                                </ProtectedRoute>
+                            }
+                        />
+                    </Routes>
+                </div>
+                {shouldShowComponents && (
+                    <Player
+                        ref={playerRef}
+                        songId={selectedSongId}
+                        setIsPlaying={setIsPlaying}
+                        currentSong={currentSong}
+                    />
+                )}
+            </div>
+        </div>
+    );
 }
 
 function AppWrapper() {
-  return (
-    <Router>
-      <App />
-    </Router>
-  );
+    return (
+        <Router>
+            <App />
+        </Router>
+    );
 }
 
 export default AppWrapper;

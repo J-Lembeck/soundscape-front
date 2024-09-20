@@ -12,8 +12,9 @@ export default function Login() {
     const handleLogin = async () => {
         try {
             const response = await api.post('/auth/login', { username, password });
-            const token = response.data;
-            localStorage.setItem('token', token);
+            localStorage.setItem('token', response.data.token);
+            localStorage.setItem('username', response.data.username);
+
             setError(null);
             navigate('/home');
         } catch (err) {
