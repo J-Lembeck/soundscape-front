@@ -8,8 +8,9 @@ import { PlayerProps } from './IPlayer';
 const Player = forwardRef(({ songId, setIsPlaying, currentSong }: PlayerProps, ref) => {
     const [duration, setDuration] = useState<number>(0);
     const [currentTime, setCurrentTime] = useState<number>(0);
-    const [volume, setVolume] = useState<number>(1);
+    const [volume, setVolume] = useState<number>(0.6);
     const [isPlaying, setPlaying] = useState<boolean>(false);
+    const [imageError, setImageError] = useState(false);
     const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
     const websocketRef = useRef<WebSocket | null>(null);
     const mediaSourceRef = useRef<MediaSource | null>(null);
@@ -27,6 +28,13 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong }: PlayerProps, r
             stopPlayback(() => setupWebSocketAndPlay(songId));
         }
     }, [songId]);
+
+    useEffect(() => {
+        setImageError(false);
+        if (audioPlayerRef.current) {
+            audioPlayerRef.current.volume = volume;
+        }
+    }, [currentSong]);
 
     const stopPlayback = (callback?: () => void) => {
         const audioPlayer = audioPlayerRef.current;
@@ -91,32 +99,32 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong }: PlayerProps, r
 
     const setupWebSocketAndPlay = (songId: number) => {
         const audioPlayer = audioPlayerRef.current;
-    
+
         if (!audioPlayer) {
             console.error('Audio element not found.');
             return;
         }
-    
+
         const mediaSource = new MediaSource();
         mediaSourceRef.current = mediaSource;
         audioPlayer.src = URL.createObjectURL(mediaSource);
-    
+
         mediaSource.addEventListener('sourceopen', handleSourceOpen);
-    
+
         const websocket = new WebSocket('ws://localhost:8080/audio-stream');
         websocketRef.current = websocket;
         websocket.binaryType = 'arraybuffer';
-    
+
         websocket.onopen = () => {
             websocket.send(`songId:${songId}`);
-            
+
             audioPlayer.play().catch((error) => {
                 console.error('Playback error:', error);
             });
             setPlaying(true);
             setIsPlaying(true);
         };
-    
+
         websocket.onmessage = (event) => {
             if (typeof event.data === 'string' && event.data.startsWith('duration:')) {
                 const duration = parseInt(event.data.split(':')[1], 10);
@@ -126,7 +134,7 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong }: PlayerProps, r
                 processQueue();
             }
         };
-    
+
         websocket.onclose = () => {
             setPlaying(false);
             setIsPlaying(false);
@@ -152,6 +160,23 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong }: PlayerProps, r
         }
     };
 
+    const PlaceholderBox = (
+        <Box
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            style={{
+                width: 90,
+                height: 90,
+                borderRadius: 4,
+                marginRight: 16,
+                backgroundColor: "#ADB5BD",
+            }}
+        >
+            <Album style={{ width: 40, height: 40, color: "#FBFAFF" }} />
+        </Box>
+    );
+
     useEffect(() => {
         const audioPlayer = audioPlayerRef.current;
         if (audioPlayer) {
@@ -168,7 +193,7 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong }: PlayerProps, r
     }, [audioPlayerRef.current]);
 
     return (
-        <Box 
+        <Box
             sx={{
                 position: 'fixed',
                 bottom: 0,
@@ -184,34 +209,37 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong }: PlayerProps, r
         >
             <audio ref={audioPlayerRef} />
 
-            {currentSong ? (
-                    <Box display="flex" alignItems="center">
-                        <img
-                            src={currentSong.imageUrl}
-                            alt="Song cover"
-                            style={{ 
-                                width: 90, 
-                                height: 90, 
-                                borderRadius: 4, 
-                                marginRight: 16, 
-                                objectFit: 'cover'  // Add this line to prevent stretching
-                            }}
-                        />
-                        <Box>
-                            <Typography variant="subtitle2">{currentSong.title}</Typography>
-                            <Typography variant="body2" color="textSecondary">{currentSong.artist.name}</Typography>
-                        </Box>
-                    </Box>
+            <Box display="flex" alignItems="center">
+                {currentSong && !imageError ? (
+                    <img
+                        src={currentSong.imageUrl}
+                        alt="Song cover"
+                        onError={() => setImageError(true)}
+                        style={{
+                            width: 90,
+                            height: 90,
+                            borderRadius: 4,
+                            marginRight: 16,
+                            objectFit: "cover",
+                        }}
+                    />
                 ) : (
-                    <Box display="flex" alignItems="center" justifyContent={"center"} style={{ width: 70, height: 70, borderRadius: 4, marginRight: 16, backgroundColor: "#ADB5BD" }}>
-                        <Album style={{ width: 40, height: 40, color: "#FBFAFF" }}/>   
+                    PlaceholderBox
+                )}
+
+                {currentSong && (
+                    <Box>
+                        <Typography variant="subtitle2">{currentSong.title}</Typography>
+                        <Typography variant="body2" color="textSecondary">
+                            {currentSong.artist.name}
+                        </Typography>
                     </Box>
-                )
-            }
+                )}
+            </Box>
 
             <Box display="flex" flexDirection="column" alignItems="center">
                 <IconButton onClick={togglePlayPause} aria-label="play-pause" disabled={!currentSong}>
-                    {isPlaying ? <PauseCircleFilled fontSize="large" style={{width: 50, height: 50, color: "#2F184B"}} /> : <PlayCircleFilled fontSize="large" style={{width: 50, height: 50, color: "#2F184B"}} />}
+                    {isPlaying ? <PauseCircleFilled fontSize="large" style={{ width: 50, height: 50, color: "#2F184B" }} /> : <PlayCircleFilled fontSize="large" style={{ width: 50, height: 50, color: "#2F184B" }} />}
                 </IconButton>
                 <Box display="flex" alignItems="center">
                     <Typography variant="caption">{`${Math.floor(currentTime / 60)}:${(currentTime % 60).toFixed(0).padStart(2, '0')}`}</Typography>
@@ -225,15 +253,15 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong }: PlayerProps, r
                     />
                     <Typography variant="caption">{`${Math.floor(duration / 60)}:${(duration % 60).toFixed(0).padStart(2, '0')}`}</Typography>
                 </Box>
-                
+
             </Box>
 
             <Box display="flex" alignItems="center">
                 <IconButton>
-                    <FavoriteBorderIcon style={{color: "#2F184B"}}/>
+                    <FavoriteBorderIcon style={{ color: "#2F184B" }} />
                 </IconButton>
                 <IconButton>
-                    <VolumeUpIcon style={{color: "#2F184B"}}/>
+                    <VolumeUpIcon style={{ color: "#2F184B" }} />
                 </IconButton>
                 <Slider
                     value={volume}

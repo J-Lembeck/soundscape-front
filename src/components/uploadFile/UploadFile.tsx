@@ -35,7 +35,7 @@ export default function UploadFile() {
     };
 
     const handleUpload = async () => {
-        if (!title || !audioFile || !imageFile) {
+        if (!title || !audioFile ) {
             alert('Please fill in all fields');
             return;
         }
@@ -43,7 +43,7 @@ export default function UploadFile() {
         const formData = new FormData();
         formData.append('title', title);
         formData.append('audioFile', audioFile);
-        formData.append('imageFile', imageFile);
+        if(imageFile) formData.append('imageFile', imageFile);
 
         try {
             const response = await api.post('/songs/upload', formData);
@@ -97,7 +97,7 @@ export default function UploadFile() {
 
                 <Box display="flex" flexDirection="column" gap={2} width="100%">
                     <TextField
-                        label="Song Title"
+                        label="Título"
                         variant="outlined"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}

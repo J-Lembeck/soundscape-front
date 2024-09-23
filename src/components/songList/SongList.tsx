@@ -5,8 +5,9 @@ import PauseIcon from '@mui/icons-material/Pause';
 import AddIcon from '@mui/icons-material/Add';
 import { SongListProps } from './ISongList';
 import api from '../../services/api';
-import { CalendarMonth, Delete, LockClock, PunchClock, QueryBuilder, QueueMusic, SentimentVeryDissatisfied, Subscriptions } from '@mui/icons-material';
+import { Album, CalendarMonth, Delete, LockClock, PunchClock, QueryBuilder, QueueMusic, SentimentVeryDissatisfied, Subscriptions } from '@mui/icons-material';
 import { useParams } from 'react-router-dom';
+import SongImage from '../../utils/songImages/SongImage';
 
 export default function SongList({ onSongSelect, playingSongId, isPlaying, togglePlayPause, songs, playlists, isPlaylist, fetchSongsFromPlaylist }: SongListProps) {
     const [hoveredSongId, setHoveredSongId] = useState<number | null>(null);
@@ -132,13 +133,7 @@ export default function SongList({ onSongSelect, playingSongId, isPlaying, toggl
                                     position="relative"
                                     style={{ marginRight: '16px' }}
                                 >
-                                    <CardMedia
-                                        component="img"
-                                        image={song.imageUrl}
-                                        alt={song.title}
-                                        style={{ width: 80, height: 80, cursor: 'pointer', borderRadius: 4 }}
-                                        onClick={() => handleImageClick(song.id)}
-                                    />
+                                    <SongImage song={song} handleImageClick={handleImageClick}/>
                                     {hoveredSongId === song.id && (
                                         <IconButton
                                             style={{
