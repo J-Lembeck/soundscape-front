@@ -1,46 +1,30 @@
-# Getting Started with Create React App
+# Soundscape
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+O **Soundscape** é uma plataforma de compartilhamento de áudio e informações sobre produção musical, equipada com ferramentas para download e reprodução de publicações de áudio. O objetivo é oferecer uma interface intuitiva e de fácil compreensão, acessível a todos os usuários. Entre as funcionalidades, os usuários poderão criar playlists e curtir músicas.
 
-## Available Scripts
+## Tecnologias Utilizadas
 
-In the project directory, you can run:
+- **Java 21**: A versão mais recente da linguagem Java, com novos recursos e melhorias.
+- **Spring Boot**: Framework para o desenvolvimento rápido de aplicações Java, com configuração automática.
+- **Hibernate**: Framework de mapeamento objeto-relacional (ORM) que facilita a comunicação entre a aplicação Java e o banco de dados.
+- **JPA (Java Persistence API)**: Especificação para o mapeamento objeto-relacional que define como os objetos Java devem ser persistidos em bancos de dados.
+- **Spring Security**: Framework que fornece autenticação e controle de acesso para aplicações Java.
 
-### `npm start`
+## Funcionalidades
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- Upload de arquivos de áudio
+- Criação de playlists
+- Reprodução de áudios via streaming
+- Curtição de músicas
+- Sistema de login e segurança via JWT
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Design
 
-### `npm test`
+Você pode acessar o design do projeto no Figma através do link abaixo:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+[Figma - Soundscape Design](https://www.figma.com/design/ecYGRVUcnXh2Zn6PqvzSnL/SoundScape?node-id=3-11&node-type=CANVAS&t=nqD1d4L04pCiMFq3-0)
 
-### `npm run build`
+## Repositórios
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+- **Back-end**: [Repositório do back-end no GitHub](https://github.com/J-Lembeck/soundscape-back)
+- **Front-end**: [Repositório do front-end no GitHub](https://github.com/J-Lembeck/soundscape-front)
