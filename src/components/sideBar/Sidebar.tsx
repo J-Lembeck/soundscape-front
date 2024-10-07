@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import api from "../../services/api";
 import { PlaylistDetails, SidebarProps } from "./ISidebar";
-import { Box, Button, IconButton, InputAdornment, InputBase, List, ListItem, ListItemIcon, ListItemText, Popover } from "@mui/material";
-import { Add, LibraryMusic, Search } from "@mui/icons-material";
+import { Alert, Box, Button, IconButton, InputAdornment, InputBase, List, ListItem, ListItemIcon, ListItemText, Popover, Snackbar, Tooltip } from "@mui/material";
+import { Add, Delete, LibraryMusic, Search } from "@mui/icons-material";
+import { NotificationType, useNotification } from "../../utils/notifications/NotificationContext";
 
-export default function Sidebar({ onPlaylistSelect }: SidebarProps) {
-    const [playlists, setPlaylists] = useState<PlaylistDetails[]>([]);
-    const [searchQuery, setSearchQuery] = useState<string>("");  // Estado para a busca
+export default function Sidebar({ playlists, setPlaylists, onPlaylistSelect }: SidebarProps) {
+    const [searchQuery, setSearchQuery] = useState<string>("");
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [newPlaylistName, setNewPlaylistName] = useState<string>("");
+    const { showNotification } = useNotification();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -31,6 +32,7 @@ export default function Sidebar({ onPlaylistSelect }: SidebarProps) {
                 await api.post(`/playlist/createNewPlaylist?playlistName=${newPlaylistName}`);
                 setNewPlaylistName("");
                 setAnchorEl(null);
+                showNotification({ type: NotificationType.SUCCESS, content: 'Playlist criada com sucesso!' });
                 fetchPlaylists();
             } catch (error) {
                 console.error('Failed to create playlist', error);
@@ -56,6 +58,14 @@ export default function Sidebar({ onPlaylistSelect }: SidebarProps) {
         searchWords.some(word => playlist.name.toLowerCase().includes(word))
     );
 
+    async function handleDeletePlaylist(playlistId: number) {
+        try {
+            await api.delete(`/playlist/deletePlaylist?playlistId=${playlistId}`);
+            fetchPlaylists();
+        } catch (error) {
+            console.error('Failed to remove song from playlist', error);
+        }
+    }
 
     const open = Boolean(anchorEl);
 
@@ -85,6 +95,11 @@ export default function Sidebar({ onPlaylistSelect }: SidebarProps) {
                             <LibraryMusic style={{ width: 40, height: 40, color: "#FBFAFF" }}/>
                         </ListItemIcon>
                         <ListItemText primary={playlist.name} />
+                        <Tooltip title="Excluir playlist">
+                            <IconButton onClick={(event) => handleDeletePlaylist(playlist.id)}>
+                                <Delete />
+                            </IconButton>
+                        </Tooltip>
                     </ListItem>
                 ))}
             </List>

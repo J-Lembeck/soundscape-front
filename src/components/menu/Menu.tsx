@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { IconButton, Popover, Avatar, MenuItem, InputBase, Box, Typography } from "@mui/material";
 import { Home, Favorite, Search, Person } from "@mui/icons-material";
+import { MenuProps } from "./IMenu";
 
-export default function Menu() {
+export default function Menu({searchValue, setSearchValue}: MenuProps) {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
     const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -12,6 +13,10 @@ export default function Menu() {
 
     const handlePopoverClose = () => {
         setAnchorEl(null);
+    };
+
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchValue(event.target.value);
     };
 
     const open = Boolean(anchorEl);
@@ -48,6 +53,8 @@ export default function Menu() {
                 <InputBase
                     placeholder="Pesquise..."
                     inputProps={{ 'aria-label': 'pesquise' }}
+                    value={searchValue}
+                    onChange={handleSearchChange}
                     style={{ width: '100%', height: '100%' }}
                 />
                 <IconButton type="submit" aria-label="search">

@@ -10,6 +10,8 @@ import SongList from './components/songList/SongList';
 import api from './services/api';
 import { PlaylistDetails } from './components/sideBar/ISidebar';
 import SongDetails from './components/songList/ISongList';
+import { Alert, Snackbar } from '@mui/material';
+import { NotificationProvider } from './utils/notifications/NotificationContext';
 
 function App() {
     const [selectedSongId, setSelectedSongId] = useState<number | undefined>(undefined);
@@ -17,15 +19,16 @@ function App() {
     const [currentSong, setCurrentSong] = useState<SongDetails | null>(null);
     const [playlists, setPlaylists] = useState<PlaylistDetails[]>([]);
     const [songs, setSongs] = useState<SongDetails[]>([]);
+    const [searchValue, setSearchValue] = useState("");
     const playerRef = useRef<{ togglePlayPause: () => void } | null>(null);
     const location = useLocation();
     const navigate = useNavigate();
 
-    const fetchSongs = async () => {
+    async function fetchSongs() {
         try {
-            const response = await api.get<SongDetails[]>('/songs/load/listAll');
-            const backendUrl = process.env.REACT_APP_API_URL;
+            const response = await api.get<SongDetails[]>(searchValue ? `/songs/searchSongs?searchTerm=${searchValue}` : '/songs/load/listAll');
 
+            const backendUrl = process.env.REACT_APP_API_URL;
             const songsWithImageUrl = response.data.map((song) => ({
                 ...song,
                 imageUrl: `${backendUrl}/songs/load/image?id=${song.id}`
@@ -36,6 +39,10 @@ function App() {
             console.error('Failed to fetch songs', error);
         }
     };
+
+    useEffect(() => {
+        fetchSongs();
+    }, [searchValue]);
 
     useEffect(() => {
         fetchSongs();
@@ -105,9 +112,9 @@ function App() {
 
     return (
         <div style={{ display: 'flex', height: '100vh' }}>
-            {shouldShowComponents && <Sidebar onPlaylistSelect={handlePlaylistSelect} />}
+            {shouldShowComponents && <Sidebar playlists={playlists} setPlaylists={setPlaylists} onPlaylistSelect={handlePlaylistSelect} />}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                {shouldShowComponents && <Menu />}
+                {shouldShowComponents && <Menu searchValue={searchValue} setSearchValue={setSearchValue} />}
                 <div style={{ flex: 1 }}>
                     <Routes>
                         <Route path="/" element={<Login />} />
@@ -167,7 +174,9 @@ function App() {
 function AppWrapper() {
     return (
         <Router>
-            <App />
+            <NotificationProvider>
+                <App />
+            </NotificationProvider>
         </Router>
     );
 }

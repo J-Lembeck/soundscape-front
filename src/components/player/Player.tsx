@@ -8,7 +8,7 @@ import { PlayerProps } from './IPlayer';
 const Player = forwardRef(({ songId, setIsPlaying, currentSong }: PlayerProps, ref) => {
     const [duration, setDuration] = useState<number>(0);
     const [currentTime, setCurrentTime] = useState<number>(0);
-    const [volume, setVolume] = useState<number>(0.6);
+    const [volume, setVolume] = useState<number>(0.7);
     const [isPlaying, setPlaying] = useState<boolean>(false);
     const [imageError, setImageError] = useState(false);
     const audioPlayerRef = useRef<HTMLAudioElement | null>(null);

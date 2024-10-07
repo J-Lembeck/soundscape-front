@@ -4,5 +4,7 @@ export interface PlaylistDetails {
 }
 
 export interface SidebarProps {
+    playlists: PlaylistDetails[];
+    setPlaylists: (value: PlaylistDetails[]) => void;
     onPlaylistSelect: (playlistId: number) => void;
   }

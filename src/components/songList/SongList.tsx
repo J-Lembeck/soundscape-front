@@ -90,13 +90,15 @@ export default function SongList({ onSongSelect, playingSongId, isPlaying, toggl
                     <Box textAlign="center">
                         <SentimentVeryDissatisfied style={{ width: 200, height: 200, color: "#2F184B" }} />
                         <Typography variant="subtitle1" gutterBottom>
-                            {"Esta playlist está vazia!"}
+                            {"Nenhuma música encontrada."}
                         </Typography>
                     </Box>
                 )}
             </Box>
         );
     }
+
+    console.log(playlists);
 
     return (
         <Box padding={"32px"} paddingLeft={"3rem"} paddingRight={"3rem"}>
@@ -114,7 +116,7 @@ export default function SongList({ onSongSelect, playingSongId, isPlaying, toggl
             </Box>
 
             <Box>
-                <Grid container spacing={3} justifyContent="center">
+                <Grid container spacing={3} justifyContent="left">
                     {songs.map((song) => (
                         <Grid item xs={12} sm={6} key={song.id}>
                             <Card
