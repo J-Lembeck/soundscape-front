@@ -1,19 +1,18 @@
+import { ArtistDTO } from "../../pages/artists/IArtist";
 import { PlaylistDetails } from "../sideBar/ISidebar";
 
-export interface ArtistDTO {
-    id: number;
-    name: string;
-}
-
 export interface SongListProps {
+    isAuthenticated: boolean;
     onSongSelect: (songId: number) => void;
     playingSongId?: number;
     isPlaying: boolean;
     togglePlayPause: () => void;
     songs: SongDetails[];
     playlists: PlaylistDetails[];
-    isPlaylist: boolean;
+    isPlaylist?: boolean;
+    isArtist?: boolean;
     fetchSongsFromPlaylist: (playlistId: number | string | undefined) => void;
+    fetchSongsFromArtist: (artistId: number | string | undefined) => void;
 }
 
 export default interface SongDetails {

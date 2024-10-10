@@ -11,9 +11,13 @@ import api from './services/api';
 import { PlaylistDetails } from './components/sideBar/ISidebar';
 import SongDetails from './components/songList/ISongList';
 import { Alert, Snackbar } from '@mui/material';
-import { NotificationProvider } from './utils/notifications/NotificationContext';
+import { NotificationProvider, NotificationType, useNotification } from './utils/notifications/NotificationContext';
+import Playlists from './pages/playlists/Playlists';
+import Home from './pages/home/Home';
+import Artists from './pages/artists/Artists';
 
 function App() {
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [selectedSongId, setSelectedSongId] = useState<number | undefined>(undefined);
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const [currentSong, setCurrentSong] = useState<SongDetails | null>(null);
@@ -23,6 +27,27 @@ function App() {
     const playerRef = useRef<{ togglePlayPause: () => void } | null>(null);
     const location = useLocation();
     const navigate = useNavigate();
+    const { showNotification } = useNotification();
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            validateToken(token);
+        }
+    }, []);
+
+    const validateToken = async (token: string) => {
+        try {
+            const response = await api.get('/auth/validate-token', {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            setIsAuthenticated(response.data);
+        } catch (error) {
+            setIsAuthenticated(false);
+        }
+    };
 
     async function fetchSongs() {
         try {
@@ -36,7 +61,18 @@ function App() {
 
             setSongs(songsWithImageUrl);
         } catch (error) {
-            console.error('Failed to fetch songs', error);
+            if (error instanceof Error) {
+                showNotification({
+                    type: NotificationType.ERROR,
+                    content: 'Falha ao carregar músicas: ' + error.message,
+                });
+            } else {
+                showNotification({
+                    type: NotificationType.ERROR,
+                    content: 'Falha ao carregar músicas: Ocorreu um erro desconhecido.',
+                });
+            }
+            setIsAuthenticated(false);
         }
     };
 
@@ -71,7 +107,17 @@ function App() {
                 const response = await api.get<PlaylistDetails[]>('/playlist/findAllByLoggedUser');
                 setPlaylists(response.data);
             } catch (error) {
-                console.error('Failed to fetch playlists', error);
+                if (error instanceof Error) {
+                    showNotification({
+                        type: NotificationType.ERROR,
+                        content: 'Falha ao carregar playlists: ' + error.message,
+                    });
+                } else {
+                    showNotification({
+                        type: NotificationType.ERROR,
+                        content: 'Falha ao carregar playlists: Ocorreu um erro desconhecido.',
+                    });
+                }
             }
         };
 
@@ -91,7 +137,45 @@ function App() {
     
                 setSongs(songsWithImageUrl);            
             } catch (error) {
-                console.error('Failed to fetch songs from playlist', error);
+                if (error instanceof Error) {
+                    showNotification({
+                        type: NotificationType.ERROR,
+                        content: 'Falha ao carregar músicas da playlist: ' + error.message,
+                    });
+                } else {
+                    showNotification({
+                        type: NotificationType.ERROR,
+                        content: 'Falha ao carregar músicas da playlist: Ocorreu um erro desconhecido.',
+                    });
+                }
+            }
+        }
+    };
+
+    const fetchSongsFromArtist = async (artistId: number | string | undefined) => {
+        if(artistId) {
+            try {
+                const response = await api.get<SongDetails[]>(`/artists/findSongsFromArtist?artistId=${artistId}`);
+                const backendUrl = process.env.REACT_APP_API_URL;
+    
+                const songsWithImageUrl = response.data.map((song) => ({
+                    ...song,
+                    imageUrl: `${backendUrl}/songs/load/image?id=${song.id}`
+                }));
+    
+                setSongs(songsWithImageUrl);            
+            } catch (error) {
+                if (error instanceof Error) {
+                    showNotification({
+                        type: NotificationType.ERROR,
+                        content: 'Falha ao carregar músicas da playlist: ' + error.message,
+                    });
+                } else {
+                    showNotification({
+                        type: NotificationType.ERROR,
+                        content: 'Falha ao carregar músicas da playlist: Ocorreu um erro desconhecido.',
+                    });
+                }
             }
         }
     };
@@ -104,7 +188,6 @@ function App() {
     };
 
     const handlePlaylistSelect = (playlistId: number) => {
-        fetchSongsFromPlaylist(playlistId);
         navigate(`/playlist/${playlistId}`);
     };
 
@@ -112,39 +195,71 @@ function App() {
 
     return (
         <div style={{ display: 'flex', height: '100vh' }}>
-            {shouldShowComponents && <Sidebar playlists={playlists} setPlaylists={setPlaylists} onPlaylistSelect={handlePlaylistSelect} />}
+            {shouldShowComponents && (
+                <Sidebar 
+                    playlists={playlists}
+                    setPlaylists={setPlaylists}
+                    onPlaylistSelect={handlePlaylistSelect}
+                    isAuthenticated={isAuthenticated}
+                />
+            )}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                {shouldShowComponents && <Menu searchValue={searchValue} setSearchValue={setSearchValue} />}
+                {shouldShowComponents && (
+                    <Menu 
+                        searchValue={searchValue}
+                        setSearchValue={setSearchValue}
+                        fetchSongsFromArtist={fetchSongsFromArtist}
+                        isAuthenticated={isAuthenticated} 
+                    />
+                )}
                 <div style={{ flex: 1 }}>
                     <Routes>
                         <Route path="/" element={<Login />} />
                         <Route
                             path="/home"
                             element={
-                                <SongList
+                                <Home
+                                    isAuthenticated={isAuthenticated}
                                     onSongSelect={handleSongSelect}
                                     playingSongId={selectedSongId}
                                     isPlaying={isPlaying}
                                     togglePlayPause={handleTogglePlayPause}
                                     songs={songs}
                                     playlists={playlists}
-                                    isPlaylist={false}
                                     fetchSongsFromPlaylist={fetchSongsFromPlaylist}
+                                    fetchSongsFromArtist={fetchSongsFromArtist}
                                 />
                             }
                         />
                         <Route
                             path="/playlist/:id"
                             element={
-                                <SongList
+                                <Playlists
+                                    isAuthenticated={isAuthenticated}
                                     onSongSelect={handleSongSelect}
                                     playingSongId={selectedSongId}
                                     isPlaying={isPlaying}
                                     togglePlayPause={handleTogglePlayPause}
                                     songs={songs}
                                     playlists={playlists}
-                                    isPlaylist={true}
                                     fetchSongsFromPlaylist={fetchSongsFromPlaylist}
+                                    fetchSongsFromArtist={fetchSongsFromArtist}
+                                />
+                            }
+                        />
+                        <Route
+                            path="/artist/:id"
+                            element={
+                                <Artists
+                                    isAuthenticated={isAuthenticated}
+                                    onSongSelect={handleSongSelect}
+                                    playingSongId={selectedSongId}
+                                    isPlaying={isPlaying}
+                                    togglePlayPause={handleTogglePlayPause}
+                                    songs={songs}
+                                    playlists={playlists}
+                                    fetchSongsFromPlaylist={fetchSongsFromPlaylist}
+                                    fetchSongsFromArtist={fetchSongsFromArtist}
                                 />
                             }
                         />
@@ -152,7 +267,7 @@ function App() {
                             path="/upload"
                             element={
                                 <ProtectedRoute>
-                                    <UploadFile />
+                                    <UploadFile fetchSongsFromArtist={fetchSongsFromArtist}/>
                                 </ProtectedRoute>
                             }
                         />

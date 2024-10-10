@@ -1,15 +1,22 @@
 import React, { useState, useRef } from 'react';
 import { TextField, Button, Box, Typography, IconButton } from '@mui/material';
 import { AudioFile, Image as ImageIcon } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
+import { NotificationType, useNotification } from '../../utils/notifications/NotificationContext';
+import { ArtistDTO } from '../../pages/artists/IArtist';
+import { IUploadFileProps } from './IUploadFile';
 
-export default function UploadFile() {
+export default function UploadFile({fetchSongsFromArtist}: IUploadFileProps) {
     const [title, setTitle] = useState<string>('');
+    const [isUploading, setIsUploading] = useState(false);
     const [audioFile, setAudioFile] = useState<File | null>(null);
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [audioFileInfo, setAudioFileInfo] = useState<{ name: string; size: number } | null>(null);
 
     const imageInputRef = useRef<HTMLInputElement | null>(null);
+    const { showNotification } = useNotification();
+    const navigate = useNavigate();
 
     const handleAudioFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files) {
@@ -34,27 +41,59 @@ export default function UploadFile() {
         }
     };
 
-    const handleUpload = async () => {
-        if (!title || !audioFile ) {
-            alert('Please fill in all fields');
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('title', title);
-        formData.append('audioFile', audioFile);
-        if(imageFile) formData.append('imageFile', imageFile);
-
+    const handleOpenMyProfile = async () => {
         try {
+            const response = await api.get<ArtistDTO>('/artists/findArtistFromLoggedUser');
+            fetchSongsFromArtist(response.data.id);
+            navigate(`/artist/${response.data.id}`);
+        } catch (error) {
+            console.error('Failed to navigate to user profile:', error);
+            showNotification({
+                type: NotificationType.ERROR,
+                content: 'Não foi possível redirecionar para o perfil do usuário.',
+            });
+        }
+    };
+
+    const handleUpload = async () => {
+        setIsUploading(true);
+        try {
+            if (!title || !audioFile) {
+                showNotification({
+                    type: NotificationType.WARNING,
+                    content: 'Por favor, preencha todos os campos.',
+                });
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('title', title);
+            formData.append('audioFile', audioFile);
+            if (imageFile) formData.append('imageFile', imageFile);
+
+        
             const response = await api.post('/songs/upload', formData);
-            alert('Upload successful: ' + response.data);
+            showNotification({
+                type: NotificationType.SUCCESS,
+                content: 'Upload realizado com sucesso!',
+            });
+            await handleOpenMyProfile();
         } catch (error) {
             if (error instanceof Error) {
-                alert('Upload failed: ' + error.message);
+                showNotification({
+                    type: NotificationType.ERROR,
+                    content: 'Falha no upload: ' + error.message,
+                });
             } else {
-                alert('Upload failed: An unknown error occurred.');
+                showNotification({
+                    type: NotificationType.ERROR,
+                    content: 'Falha no upload: Ocorreu um erro desconhecido.',
+                });
             }
+        } finally {
+            setIsUploading(false);
         }
+        
     };
 
     return (
@@ -79,7 +118,7 @@ export default function UploadFile() {
                                     width: '200px',
                                     height: '200px',
                                     objectFit: 'cover',
-                                    borderRadius: '4px'
+                                    borderRadius: '4px',
                                 }}
                             />
                         ) : (
@@ -116,8 +155,8 @@ export default function UploadFile() {
                         )}
                     </Box>
 
-                    <Button variant="contained" color="primary" onClick={handleUpload} fullWidth>
-                        Enviar
+                    <Button variant="contained" color="primary" onClick={handleUpload} fullWidth disabled={isUploading}>
+                        {isUploading ? 'Enviando...' : 'Enviar'}
                     </Button>
                 </Box>
             </Box>

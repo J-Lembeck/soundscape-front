@@ -1,11 +1,15 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { IconButton, Popover, Avatar, MenuItem, InputBase, Box, Typography } from "@mui/material";
-import { Home, Favorite, Search, Person } from "@mui/icons-material";
+import { Link, useNavigate } from "react-router-dom";
+import { IconButton, Popover, Avatar, MenuItem, InputBase, Box, Typography, MenuList } from "@mui/material";
+import { Home, Favorite, Search, Person, UploadFile, Logout } from "@mui/icons-material";
 import { MenuProps } from "./IMenu";
+import api from "../../services/api";
+import { ArtistDTO } from "../../pages/artists/IArtist";
 
-export default function Menu({searchValue, setSearchValue}: MenuProps) {
+export default function Menu({searchValue, setSearchValue, fetchSongsFromArtist, isAuthenticated}: MenuProps) {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const [myProfile, setMyProfile] = useState<ArtistDTO>();
+    const navigate = useNavigate();
 
     const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
@@ -19,6 +23,12 @@ export default function Menu({searchValue, setSearchValue}: MenuProps) {
         setSearchValue(event.target.value);
     };
 
+    async function handleOpenMyPorfile() {
+        const response = await api.get<ArtistDTO>(`/artists/findArtistFromLoggedUser`);
+        navigate(`/artist/${response.data.id}`)
+        fetchSongsFromArtist(response.data.id);
+        handlePopoverClose();
+    }
     const open = Boolean(anchorEl);
 
     return (
@@ -31,12 +41,15 @@ export default function Menu({searchValue, setSearchValue}: MenuProps) {
                     Home
                 </Link>
 
-                <Link to="/favorites" style={{ textDecoration: 'none', color: '#4B306A' }}>
-                    <IconButton>
-                        <Favorite style={{color: "#2F184B"}} />
-                    </IconButton>
-                    Curtidas
-                </Link>
+                {isAuthenticated && (
+                    <Link  to="/favorites" style={{ textDecoration: 'none', color: '#4B306A' }}>
+                        <IconButton>
+                            <Favorite style={{color: "#2F184B"}} />
+                        </IconButton>
+                        Curtidas
+                    </Link>
+                )}
+                
             </div>
 
             <div style={{
@@ -65,7 +78,7 @@ export default function Menu({searchValue, setSearchValue}: MenuProps) {
             <div>
                 <Box display={"flex"} flexDirection={"row"} alignContent={"center"} alignItems={"center"}>
                     <Typography> 
-                        {localStorage.getItem("username") ? localStorage.getItem("username") : "Fazer login"}
+                        {isAuthenticated ? localStorage.getItem("username") : "Fazer login"}
                     </Typography>
                     <IconButton onClick={handlePopoverOpen}>
                         <Avatar style={{ backgroundColor: '#4B306A', paddingRight: 0 }}>
@@ -73,22 +86,42 @@ export default function Menu({searchValue, setSearchValue}: MenuProps) {
                         </Avatar>
                     </IconButton>
                 </Box>
-                
-                <Popover
-                    open={open}
-                    anchorEl={anchorEl}
-                    onClose={handlePopoverClose}
-                    anchorOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'right',
-                    }}
-                >
-                    <MenuItem onClick={handlePopoverClose}>
-                        <Link to="/upload" style={{ textDecoration: 'none', color: '#4B306A' }}>
-                            Upload
-                        </Link>
-                    </MenuItem>
-                </Popover>
+                {isAuthenticated && (
+                    <Popover
+                        open={open}
+                        anchorEl={anchorEl}
+                        onClose={handlePopoverClose}
+                        anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'right',
+                        }}
+                    >
+                        <MenuList >
+                            <MenuItem onClick={handlePopoverClose} >
+                                <Link to="/upload" style={{ textDecoration: 'none', color: '#4B306A', display: "flex", flexDirection: "row" }} >
+                                    <UploadFile style={{paddingRight: "0.5rem"}}/>
+                                    <Typography>
+                                        Enviar
+                                    </Typography>
+                                </Link>
+                            </MenuItem >
+                            <MenuItem onClick={() => {handleOpenMyPorfile()}} >
+                                <Typography style={{ textDecoration: 'none', color: '#4B306A', display: "flex", flexDirection: "row" }}>
+                                    <Person style={{paddingRight: "0.5rem"}}/>
+                                    Meu Perfil
+                                </Typography>
+                            </MenuItem >
+                            <MenuItem onClick={handlePopoverClose} >
+                                <Link to="/login" style={{ textDecoration: 'none', color: '#4B306A', display: "flex", flexDirection: "row" }} >
+                                    <Logout style={{paddingRight: "0.5rem"}}/>
+                                    <Typography>
+                                        Sair
+                                    </Typography>
+                                </Link>
+                            </MenuItem>
+                        </MenuList>
+                    </Popover>
+                )}
             </div>
         </nav>
     );

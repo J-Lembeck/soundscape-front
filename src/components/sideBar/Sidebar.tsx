@@ -2,16 +2,15 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
 import api from "../../services/api";
 import { PlaylistDetails, SidebarProps } from "./ISidebar";
-import { Alert, Box, Button, IconButton, InputAdornment, InputBase, List, ListItem, ListItemIcon, ListItemText, Popover, Snackbar, Tooltip } from "@mui/material";
-import { Add, Delete, LibraryMusic, Search } from "@mui/icons-material";
+import { Alert, Box, Button, IconButton, InputAdornment, InputBase, List, ListItem, ListItemIcon, ListItemText, Popover, Snackbar, Tooltip, Typography } from "@mui/material";
+import { Add, Delete, LibraryMusic, Search, SentimentVerySatisfied } from "@mui/icons-material";
 import { NotificationType, useNotification } from "../../utils/notifications/NotificationContext";
 
-export default function Sidebar({ playlists, setPlaylists, onPlaylistSelect }: SidebarProps) {
+export default function Sidebar({ playlists, setPlaylists, onPlaylistSelect, isAuthenticated }: SidebarProps) {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [newPlaylistName, setNewPlaylistName] = useState<string>("");
     const { showNotification } = useNotification();
-    const navigate = useNavigate();
 
     useEffect(() => {
         fetchPlaylists();
@@ -22,7 +21,17 @@ export default function Sidebar({ playlists, setPlaylists, onPlaylistSelect }: S
             const response = await api.get<PlaylistDetails[]>('/playlist/findAllByLoggedUser');
             setPlaylists(response.data);
         } catch (error) {
-            console.error('Failed to fetch playlists', error);
+            if (error instanceof Error) {
+                showNotification({
+                    type: NotificationType.ERROR,
+                    content: 'Falha ao carregar playlists: ' + error.message,
+                });
+            } else {
+                showNotification({
+                    type: NotificationType.ERROR,
+                    content: 'Falha ao carregar playlists: Ocorreu um erro desconhecido.',
+                });
+            }
         }
     };
 
@@ -35,7 +44,17 @@ export default function Sidebar({ playlists, setPlaylists, onPlaylistSelect }: S
                 showNotification({ type: NotificationType.SUCCESS, content: 'Playlist criada com sucesso!' });
                 fetchPlaylists();
             } catch (error) {
-                console.error('Failed to create playlist', error);
+                if (error instanceof Error) {
+                    showNotification({
+                        type: NotificationType.ERROR,
+                        content: 'Falha ao criar playlist: ' + error.message,
+                    });
+                } else {
+                    showNotification({
+                        type: NotificationType.ERROR,
+                        content: 'Falha ao criar playlist: Ocorreu um erro desconhecido.',
+                    });
+                }
             }
         }
     };
@@ -61,9 +80,23 @@ export default function Sidebar({ playlists, setPlaylists, onPlaylistSelect }: S
     async function handleDeletePlaylist(playlistId: number) {
         try {
             await api.delete(`/playlist/deletePlaylist?playlistId=${playlistId}`);
+            showNotification({
+                type: NotificationType.SUCCESS,
+                content: 'Playlist excluida com sucesso.',
+            });
             fetchPlaylists();
         } catch (error) {
-            console.error('Failed to remove song from playlist', error);
+            if (error instanceof Error) {
+                showNotification({
+                    type: NotificationType.ERROR,
+                    content: 'Falha ao excluir playlist: ' + error.message,
+                });
+            } else {
+                showNotification({
+                    type: NotificationType.ERROR,
+                    content: 'Falha ao excluir playlist: Ocorreu um erro desconhecido.',
+                });
+            }
         }
     }
 
@@ -71,64 +104,75 @@ export default function Sidebar({ playlists, setPlaylists, onPlaylistSelect }: S
 
     return (
         <Box sx={{ width: '320px', backgroundColor: '#F4EFFA', padding: '16px', paddingTop: 0}}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 , height: "85px"}}>
-                <InputBase
-                    style={{backgroundColor: "#FBFAFF"}}
-                    placeholder="Pesquise..."
-                    value={searchQuery} 
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    sx={{ ml: 1, p: 1, flex: 1, borderRadius: "6px", height: "55px"}}
-                    startAdornment={
-                        <InputAdornment position="start">
-                            <Search />
-                        </InputAdornment>
-                    }
-                />
-                <IconButton onClick={handlePopoverOpen}>
-                    <Add />
-                </IconButton>
-            </Box>
-            <List>
-                {filteredPlaylists.map(playlist => (
-                    <ListItem key={playlist.id} button onClick={() => handlePlaylistClick(playlist.id)}>
-                        <ListItemIcon style={{ display: "flex", justifyContent: "center", alignItems: "center", width: 70, height: 70, borderRadius: 4, marginRight: 16, backgroundColor: "#ADB5BD" }}>
-                            <LibraryMusic style={{ width: 40, height: 40, color: "#FBFAFF" }}/>
-                        </ListItemIcon>
-                        <ListItemText primary={playlist.name} />
-                        <Tooltip title="Excluir playlist">
-                            <IconButton onClick={(event) => handleDeletePlaylist(playlist.id)}>
-                                <Delete />
-                            </IconButton>
-                        </Tooltip>
-                    </ListItem>
-                ))}
-            </List>
-
-            <Popover
-                open={open}
-                anchorEl={anchorEl}
-                onClose={handlePopoverClose}
-                anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'center',
-                }}
-                transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'center',
-                }}
-            >
-                <Box sx={{ p: 2 }}>
-                    <InputBase
-                        placeholder="Nome da nova playlist"
-                        value={newPlaylistName}
-                        onChange={(e) => setNewPlaylistName(e.target.value)}
-                        fullWidth
-                    />
-                    <Button variant="contained" onClick={handleCreatePlaylist}>
-                        Criar
-                    </Button>
+            {isAuthenticated && (
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 , height: "85px"}}>
+                        <InputBase
+                            style={{backgroundColor: "#FBFAFF"}}
+                            placeholder="Pesquise..."
+                            value={searchQuery} 
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            sx={{ ml: 1, p: 1, flex: 1, borderRadius: "6px", height: "55px"}}
+                            startAdornment={
+                                <InputAdornment position="start">
+                                    <Search />
+                                </InputAdornment>
+                            }
+                        />
+                        <IconButton onClick={handlePopoverOpen}>
+                            <Add />
+                        </IconButton>
                 </Box>
-            </Popover>
+            )}
+            {!isAuthenticated && (
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 , height: "85px", justifyContent: "center", flexDirection: "column"}} style={{height: "100%"}}>
+                    <SentimentVerySatisfied style={{fontSize: 150, color: "#2F184B"}}/>
+                    <Typography variant="subtitle1" gutterBottom style={{ textAlign: 'center' }}> Faça login ou crie uma conta para poder criar playlists! </Typography>
+                </Box>
+            )}
+            {isAuthenticated && (
+                <List>
+                    {filteredPlaylists.map(playlist => (
+                        <ListItem key={playlist.id} button onClick={() => handlePlaylistClick(playlist.id)}>
+                            <ListItemIcon style={{ display: "flex", justifyContent: "center", alignItems: "center", width: 70, height: 70, borderRadius: 4, marginRight: 16, backgroundColor: "#ADB5BD" }}>
+                                <LibraryMusic style={{ width: 40, height: 40, color: "#FBFAFF" }}/>
+                            </ListItemIcon>
+                            <ListItemText primary={playlist.name} />
+                            <Tooltip title="Excluir playlist">
+                                <IconButton onClick={(event) => handleDeletePlaylist(playlist.id)}>
+                                    <Delete />
+                                </IconButton>
+                            </Tooltip>
+                        </ListItem>
+                    ))}
+                </List>
+            )}
+            {isAuthenticated && (
+                <Popover
+                    open={open}
+                    anchorEl={anchorEl}
+                    onClose={handlePopoverClose}
+                    anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'center',
+                    }}
+                    transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'center',
+                    }}
+                >
+                    <Box sx={{ p: 2 }}>
+                        <InputBase
+                            placeholder="Nome da nova playlist"
+                            value={newPlaylistName}
+                            onChange={(e) => setNewPlaylistName(e.target.value)}
+                            fullWidth
+                        />
+                        <Button variant="contained" onClick={handleCreatePlaylist}>
+                            Criar
+                        </Button>
+                    </Box>
+                </Popover>
+            )}
         </Box>
     );
 }
