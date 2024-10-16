@@ -4,4 +4,5 @@ export interface PlayerProps {
     songId?: number;
     setIsPlaying: (isPlaying: boolean) => void;
     currentSong: SongDetails | null;
+    isAuthenticated: boolean;
 }

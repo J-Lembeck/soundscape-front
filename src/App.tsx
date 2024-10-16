@@ -102,6 +102,8 @@ function App() {
     };
 
     useEffect(() => {
+        if(!isAuthenticated) return;
+
         const fetchPlaylists = async () => {
             try {
                 const response = await api.get<PlaylistDetails[]>('/playlist/findAllByLoggedUser');
@@ -214,7 +216,7 @@ function App() {
                 )}
                 <div style={{ flex: 1 }}>
                     <Routes>
-                        <Route path="/" element={<Login />} />
+                        <Route path="/" element={<Login setIsAuthenticated={setIsAuthenticated}/>} />
                         <Route
                             path="/home"
                             element={
@@ -264,6 +266,22 @@ function App() {
                             }
                         />
                         <Route
+                            path="/favorites"
+                            element={
+                                <Artists
+                                    isAuthenticated={isAuthenticated}
+                                    onSongSelect={handleSongSelect}
+                                    playingSongId={selectedSongId}
+                                    isPlaying={isPlaying}
+                                    togglePlayPause={handleTogglePlayPause}
+                                    songs={songs}
+                                    playlists={playlists}
+                                    fetchSongsFromPlaylist={fetchSongsFromPlaylist}
+                                    fetchSongsFromArtist={fetchSongsFromArtist}
+                                />
+                            }
+                        />
+                        <Route
                             path="/upload"
                             element={
                                 <ProtectedRoute>
@@ -279,6 +297,7 @@ function App() {
                         songId={selectedSongId}
                         setIsPlaying={setIsPlaying}
                         currentSong={currentSong}
+                        isAuthenticated={isAuthenticated}
                     />
                 )}
             </div>

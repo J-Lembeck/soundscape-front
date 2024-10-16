@@ -13,6 +13,7 @@ export default function Sidebar({ playlists, setPlaylists, onPlaylistSelect, isA
     const { showNotification } = useNotification();
 
     useEffect(() => {
+        if(!isAuthenticated) return;
         fetchPlaylists();
     }, []);
 

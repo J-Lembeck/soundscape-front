@@ -1,16 +1,21 @@
 import React, { useState, useRef, useEffect, useImperativeHandle, forwardRef } from 'react';
 import { Slider, Typography, IconButton, Box } from '@mui/material';
+import api from "../../services/api";
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import { Album, MusicNote, PauseCircleFilled, PlayCircleFilled } from '@mui/icons-material';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import { Album, PauseCircleFilled, PlayCircleFilled } from '@mui/icons-material';
 import { PlayerProps } from './IPlayer';
+import { NotificationType, useNotification } from '../../utils/notifications/NotificationContext';
 
-const Player = forwardRef(({ songId, setIsPlaying, currentSong }: PlayerProps, ref) => {
+const Player = forwardRef(({ songId, setIsPlaying, currentSong, isAuthenticated }: PlayerProps, ref) => {
     const [duration, setDuration] = useState<number>(0);
     const [currentTime, setCurrentTime] = useState<number>(0);
     const [volume, setVolume] = useState<number>(0.7);
     const [isPlaying, setPlaying] = useState<boolean>(false);
     const [imageError, setImageError] = useState(false);
+    const [isLiked, setIsLiked] = useState<boolean>(false);
+    const { showNotification } = useNotification();
     const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
     const websocketRef = useRef<WebSocket | null>(null);
     const mediaSourceRef = useRef<MediaSource | null>(null);
@@ -34,6 +39,7 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong }: PlayerProps, r
         if (audioPlayerRef.current) {
             audioPlayerRef.current.volume = volume;
         }
+        setIsLiked(currentSong?.isLiked ? true : false);
     }, [currentSong]);
 
     const stopPlayback = (callback?: () => void) => {
@@ -101,7 +107,10 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong }: PlayerProps, r
         const audioPlayer = audioPlayerRef.current;
 
         if (!audioPlayer) {
-            console.error('Audio element not found.');
+            showNotification({
+                type: NotificationType.ERROR,
+                content: 'Falha ao carregar música.'
+            });
             return;
         }
 
@@ -119,7 +128,11 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong }: PlayerProps, r
             websocket.send(`songId:${songId}`);
 
             audioPlayer.play().catch((error) => {
-                console.error('Playback error:', error);
+                showNotification({
+                    type: NotificationType.ERROR,
+                    content: 'Falha ao na reprodução'
+                });
+                return;
             });
             setPlaying(true);
             setIsPlaying(true);
@@ -152,11 +165,40 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong }: PlayerProps, r
                 setupWebSocketAndPlay(songId);
             } else {
                 audioPlayer.play().catch((error) => {
-                    console.error('Playback error:', error);
+                    showNotification({
+                        type: NotificationType.ERROR,
+                        content: 'Falha na reprodução.'
+                    });
+                    return;
                 });
                 setPlaying(true);
                 setIsPlaying(true);
             }
+        }
+    };
+
+    const handleLikeSong = async () => {
+        if (!currentSong) return;
+        if (!isAuthenticated) {
+            showNotification({
+                type: NotificationType.INFO,
+                content: 'Faça login para curtir músicas.'
+            });
+            return;
+        }
+
+        try {
+            await api.put(`/songs/likeSong?songId=${currentSong.id}`);
+            setIsLiked(!currentSong.isLiked); 
+            showNotification({
+                type: NotificationType.SUCCESS,
+                content: 'Música curtida com sucesso.'
+            });
+        } catch (error) {
+            showNotification({
+                type: NotificationType.ERROR,
+                content: 'Falha ao curtir a música.'
+            });
         }
     };
 
@@ -228,11 +270,22 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong }: PlayerProps, r
                 )}
 
                 {currentSong && (
-                    <Box>
-                        <Typography variant="subtitle2">{currentSong.title}</Typography>
-                        <Typography variant="body2" color="textSecondary">
-                            {currentSong.artist.name}
-                        </Typography>
+                    <Box display="flex" alignItems="center">
+                        <Box>
+                            <Box display="flex" alignItems="center">
+                                <Typography variant="subtitle2">{currentSong.title}</Typography>
+                            </Box>
+                            <Typography variant="body2" color="textSecondary">
+                                {currentSong.artist.name}
+                            </Typography>
+                        </Box>
+                        <IconButton onClick={handleLikeSong}>
+                            {isLiked ? (
+                                <FavoriteIcon style={{ color: "#2F184B" }} />
+                            ) : (
+                                <FavoriteBorderIcon style={{ color: "#2F184B" }} />
+                            )}
+                        </IconButton>
                     </Box>
                 )}
             </Box>
@@ -257,9 +310,6 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong }: PlayerProps, r
             </Box>
 
             <Box display="flex" alignItems="center">
-                <IconButton>
-                    <FavoriteBorderIcon style={{ color: "#2F184B" }} />
-                </IconButton>
                 <IconButton>
                     <VolumeUpIcon style={{ color: "#2F184B" }} />
                 </IconButton>

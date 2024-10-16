@@ -3,8 +3,9 @@ import { Box, Button, TextField, Typography, Container, Alert } from '@mui/mater
 import api from '../../services/api';
 import { useNavigate } from 'react-router-dom';
 import { NotificationType, useNotification } from '../../utils/notifications/NotificationContext';
+import { ILoginProps } from './ILogin';
 
-export default function Login() {
+export default function Login({setIsAuthenticated}: ILoginProps) {
     const [username, setUsername] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
@@ -16,6 +17,7 @@ export default function Login() {
             const response = await api.post('/auth/login', { username, password });
             localStorage.setItem('token', response.data.token);
             localStorage.setItem('username', response.data.username);
+            setIsAuthenticated(true);
 
             setError(null);
             navigate('/home');

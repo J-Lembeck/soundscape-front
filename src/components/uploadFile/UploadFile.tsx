@@ -47,7 +47,6 @@ export default function UploadFile({fetchSongsFromArtist}: IUploadFileProps) {
             fetchSongsFromArtist(response.data.id);
             navigate(`/artist/${response.data.id}`);
         } catch (error) {
-            console.error('Failed to navigate to user profile:', error);
             showNotification({
                 type: NotificationType.ERROR,
                 content: 'Não foi possível redirecionar para o perfil do usuário.',

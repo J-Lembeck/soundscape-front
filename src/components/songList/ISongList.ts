@@ -22,4 +22,5 @@ export default interface SongDetails {
     creationDate: string;
     length: number;
     imageUrl: string;
+    isLiked: boolean;
 }

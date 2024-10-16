@@ -8,7 +8,6 @@ import { ArtistDTO } from "../../pages/artists/IArtist";
 
 export default function Menu({searchValue, setSearchValue, fetchSongsFromArtist, isAuthenticated}: MenuProps) {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const [myProfile, setMyProfile] = useState<ArtistDTO>();
     const navigate = useNavigate();
 
     const handlePopoverOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -42,14 +41,13 @@ export default function Menu({searchValue, setSearchValue, fetchSongsFromArtist,
                 </Link>
 
                 {isAuthenticated && (
-                    <Link  to="/favorites" style={{ textDecoration: 'none', color: '#4B306A' }}>
+                    <Link to="/favorites" style={{ textDecoration: 'none', color: '#4B306A' }}>
                         <IconButton>
                             <Favorite style={{color: "#2F184B"}} />
                         </IconButton>
                         Curtidas
                     </Link>
                 )}
-                
             </div>
 
             <div style={{
