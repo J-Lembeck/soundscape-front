@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
 import api from "../../services/api";
 import { PlaylistDetails, SidebarProps } from "./ISidebar";
-import { Alert, Box, Button, IconButton, InputAdornment, InputBase, List, ListItem, ListItemIcon, ListItemText, Popover, Snackbar, Tooltip, Typography } from "@mui/material";
+import { Alert, Box, Button, CircularProgress, IconButton, InputAdornment, InputBase, List, ListItem, ListItemIcon, ListItemText, Popover, Snackbar, Tooltip, Typography } from "@mui/material";
 import { Add, Delete, LibraryMusic, Search, SentimentVerySatisfied } from "@mui/icons-material";
 import { NotificationType, useNotification } from "../../utils/notifications/NotificationContext";
 
-export default function Sidebar({ playlists, setPlaylists, onPlaylistSelect, isAuthenticated }: SidebarProps) {
+export default function Sidebar({ playlists, setPlaylists, onPlaylistSelect, isAuthenticated, isPlaylistsLoading }: SidebarProps) {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [newPlaylistName, setNewPlaylistName] = useState<string>("");
@@ -102,6 +102,16 @@ export default function Sidebar({ playlists, setPlaylists, onPlaylistSelect, isA
     }
 
     const open = Boolean(anchorEl);
+
+    if (isPlaylistsLoading) {
+        return (
+            <Box sx={{ width: '320px', backgroundColor: '#F4EFFA', padding: '16px', paddingTop: 0}}>
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                    <CircularProgress />
+                </div>
+            </Box>
+        );
+    }
 
     return (
         <Box sx={{ width: '320px', backgroundColor: '#F4EFFA', padding: '16px', paddingTop: 0}}>

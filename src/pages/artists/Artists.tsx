@@ -1,13 +1,13 @@
-import { Typography, Box, Avatar } from '@mui/material';
-import { QueueMusic, SentimentVeryDissatisfied } from '@mui/icons-material';
+import { Typography, Box, Avatar, CircularProgress } from '@mui/material';
+import { SentimentVeryDissatisfied } from '@mui/icons-material';
 import { useParams } from 'react-router-dom';
-import { SongListProps } from '../../components/songList/ISongList';
 import SongList from '../../components/songList/SongList';
-import { ArtistDTO } from './IArtist';
+import { ArtistDTO, ArtistProps } from './IArtist';
 import { useEffect, useState } from 'react';
 import api from '../../services/api';
 
-export default function Artists({ isAuthenticated, onSongSelect, playingSongId, isPlaying, togglePlayPause, songs, playlists, isPlaylist, fetchSongsFromPlaylist, fetchSongsFromArtist }: SongListProps) {
+export default function Artists({ isAuthenticated, onSongSelect, playingSongId, isPlaying, togglePlayPause, songs, playlists, isPlaylist, 
+    fetchSongsFromPlaylist, fetchSongsFromArtist, isSongsLoading }: ArtistProps) {
     const [selectedArtist, setSelectedArtist] = useState<ArtistDTO>();
     const { id: artistId } = useParams();
 
@@ -18,6 +18,14 @@ export default function Artists({ isAuthenticated, onSongSelect, playingSongId, 
     async function fetchArtist(artistId: string) {
         const response = await api.get<ArtistDTO>(`/artists/findById?artistId=${artistId}`)
         setSelectedArtist(response.data);
+    }
+
+    if (isSongsLoading) {
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                <CircularProgress />
+            </div>
+        );
     }
 
     if (songs.length === 0) {

@@ -19,6 +19,8 @@ import Favorites from './pages/Favorites/Favorites';
 
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isSongsLoading, setIsSongsLoading] = useState(false);
+    const [isPlaylistsLoading, setIsPlaylistsLoading] = useState(true);
     const [selectedSongId, setSelectedSongId] = useState<number | undefined>(undefined);
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
     const [currentSong, setCurrentSong] = useState<SongDetails | null>(null);
@@ -51,15 +53,16 @@ function App() {
     };
 
     async function fetchSongs() {
+        setIsSongsLoading(true);
         try {
             const response = await api.get<SongDetails[]>(searchValue ? `/songs/searchSongs?searchTerm=${searchValue}` : '/songs/load/listAll');
-
+    
             const backendUrl = process.env.REACT_APP_API_URL;
             const songsWithImageUrl = response.data.map((song) => ({
                 ...song,
                 imageUrl: `${backendUrl}/songs/load/image?id=${song.id}`
             }));
-
+    
             setSongs(songsWithImageUrl);
         } catch (error) {
             if (error instanceof Error) {
@@ -74,11 +77,21 @@ function App() {
                 });
             }
             setIsAuthenticated(false);
+        } finally {
+            setIsSongsLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchSongs();
+        const delayDebounceFn = setTimeout(() => {
+            fetchSongs();
+
+            if (location.pathname !== '/home') {
+                navigate('/home');
+            }
+        }, 500);
+
+        return () => clearTimeout(delayDebounceFn);
     }, [searchValue]);
 
     useEffect(() => {
@@ -107,6 +120,7 @@ function App() {
 
         const fetchPlaylists = async () => {
             try {
+                setIsPlaylistsLoading(true)
                 const response = await api.get<PlaylistDetails[]>('/playlist/findAllByLoggedUser');
                 setPlaylists(response.data);
             } catch (error) {
@@ -121,13 +135,16 @@ function App() {
                         content: 'Falha ao carregar playlists: Ocorreu um erro desconhecido.',
                     });
                 }
+            } finally {
+                setIsPlaylistsLoading(false)
             }
         };
 
         fetchPlaylists();
-    }, []);
+    }, [isAuthenticated]);
 
     const fetchSongsFromPlaylist = async (playlistId: number | string | undefined) => {
+        setIsSongsLoading(true);
         if(playlistId) {
             try {
                 const response = await api.get<SongDetails[]>(`/playlist/findSongsFromPlaylist?playlistId=${playlistId}`);
@@ -151,11 +168,16 @@ function App() {
                         content: 'Falha ao carregar músicas da playlist: Ocorreu um erro desconhecido.',
                     });
                 }
+            } finally {
+                setIsSongsLoading(false);
             }
+        } else {
+            setIsSongsLoading(false);
         }
-    };
+    };    
 
     const fetchSongsFromArtist = async (artistId: number | string | undefined) => {
+        setIsSongsLoading(true);
         if(artistId) {
             try {
                 const response = await api.get<SongDetails[]>(`/artists/findSongsFromArtist?artistId=${artistId}`);
@@ -171,19 +193,24 @@ function App() {
                 if (error instanceof Error) {
                     showNotification({
                         type: NotificationType.ERROR,
-                        content: 'Falha ao carregar músicas da playlist: ' + error.message,
+                        content: 'Falha ao carregar músicas do artista: ' + error.message,
                     });
                 } else {
                     showNotification({
                         type: NotificationType.ERROR,
-                        content: 'Falha ao carregar músicas da playlist: Ocorreu um erro desconhecido.',
+                        content: 'Falha ao carregar músicas do artista: Ocorreu um erro desconhecido.',
                     });
                 }
+            } finally {
+                setIsSongsLoading(false);
             }
+        } else {
+            setIsSongsLoading(false);
         }
-    };
+    };    
 
     const fetchLikedSongs = async () => {
+        setIsSongsLoading(true);
         if(isAuthenticated) {
             try {
                 const response = await api.get<SongDetails[]>(`/songs/findLikedSongs`);
@@ -207,9 +234,13 @@ function App() {
                         content: 'Falha ao carregar músicas curtidas: Ocorreu um erro desconhecido.',
                     });
                 }
+            } finally {
+                setIsSongsLoading(false);
             }
+        } else {
+            setIsSongsLoading(false);
         }
-    };
+    };    
 
     const handleTogglePlayPause = () => {
         if (playerRef.current) {
@@ -232,6 +263,7 @@ function App() {
                     setPlaylists={setPlaylists}
                     onPlaylistSelect={handlePlaylistSelect}
                     isAuthenticated={isAuthenticated}
+                    isPlaylistsLoading={isPlaylistsLoading}
                 />
             )}
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
@@ -259,9 +291,11 @@ function App() {
                                     playlists={playlists}
                                     fetchSongsFromPlaylist={fetchSongsFromPlaylist}
                                     fetchSongsFromArtist={fetchSongsFromArtist}
+                                    isSongsLoading={isSongsLoading}
                                 />
                             }
                         />
+
                         <Route
                             path="/playlist/:id"
                             element={
@@ -275,9 +309,11 @@ function App() {
                                     playlists={playlists}
                                     fetchSongsFromPlaylist={fetchSongsFromPlaylist}
                                     fetchSongsFromArtist={fetchSongsFromArtist}
+                                    isSongsLoading={isSongsLoading}
                                 />
                             }
                         />
+
                         <Route
                             path="/artist/:id"
                             element={
@@ -291,9 +327,11 @@ function App() {
                                     playlists={playlists}
                                     fetchSongsFromPlaylist={fetchSongsFromPlaylist}
                                     fetchSongsFromArtist={fetchSongsFromArtist}
+                                    isSongsLoading={isSongsLoading}
                                 />
                             }
                         />
+
                         <Route
                             path="/favorites"
                             element={
@@ -309,6 +347,7 @@ function App() {
                                         fetchSongsFromPlaylist={fetchSongsFromPlaylist}
                                         fetchSongsFromArtist={fetchSongsFromArtist}
                                         fetchLikedSongs={fetchLikedSongs}
+                                        isSongsLoading={isSongsLoading}
                                     />
                                 </ProtectedRoute>
                             }

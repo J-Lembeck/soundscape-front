@@ -1,12 +1,7 @@
 import { PlaylistDetails } from "../../components/sideBar/ISidebar";
 import SongDetails from "../../components/songList/ISongList";
 
-export interface ArtistDTO {
-    id: number;
-    name: string;
-}
-
-export interface ArtistProps {
+export interface PlaylistProps {
     isAuthenticated: boolean;
     onSongSelect: (songId: number) => void;
     playingSongId?: number;

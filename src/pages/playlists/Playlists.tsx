@@ -1,16 +1,25 @@
-import { Typography, Box } from '@mui/material';
+import { Typography, Box, CircularProgress } from '@mui/material';
 import { QueueMusic, SentimentVeryDissatisfied } from '@mui/icons-material';
 import { useParams } from 'react-router-dom';
-import { SongListProps } from '../../components/songList/ISongList';
 import SongList from '../../components/songList/SongList';
 import { useEffect } from 'react';
+import { PlaylistProps } from './IPlaylists';
 
-export default function Playlists({ isAuthenticated, onSongSelect, playingSongId, isPlaying, togglePlayPause, songs, playlists, fetchSongsFromPlaylist, fetchSongsFromArtist }: SongListProps) {
+export default function Playlists({ isAuthenticated, onSongSelect, playingSongId, isPlaying, togglePlayPause, songs, playlists, fetchSongsFromPlaylist, 
+    fetchSongsFromArtist, isSongsLoading }: PlaylistProps) {
     const { id: playlistId } = useParams();
 
     useEffect(() => {
         if(playlistId) fetchSongsFromPlaylist(playlistId);
     }, [playlistId])
+
+    if (isSongsLoading) {
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                <CircularProgress />
+            </div>
+        );
+    }
 
     if (songs.length === 0) {
         return (

@@ -1,9 +1,19 @@
-import { Typography, Box } from '@mui/material';
+import { Typography, Box, CircularProgress } from '@mui/material';
 import { QueueMusic, SentimentVeryDissatisfied } from '@mui/icons-material';
-import { SongListProps } from '../../components/songList/ISongList';
 import SongList from '../../components/songList/SongList';
+import { HomeProps } from './IHome';
 
-export default function Home({ isAuthenticated, onSongSelect, playingSongId, isPlaying, togglePlayPause, songs, playlists, fetchSongsFromPlaylist, fetchSongsFromArtist }: SongListProps) {
+export default function Home({ isAuthenticated, onSongSelect, playingSongId, isPlaying, togglePlayPause, songs, playlists, fetchSongsFromPlaylist, 
+    fetchSongsFromArtist, isSongsLoading }: HomeProps) {
+ 
+    if (isSongsLoading) {
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                <CircularProgress />
+            </div>
+        );
+    }
+
     if (songs.length === 0) {
         return (
             <Box

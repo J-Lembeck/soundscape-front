@@ -1,15 +1,23 @@
-import { Typography, Box } from '@mui/material';
+import { Typography, Box, CircularProgress } from '@mui/material';
 import { Favorite, SentimentVeryDissatisfied } from '@mui/icons-material';
 import SongList from '../../components/songList/SongList';
 import { useEffect } from 'react';
 import { FavoritesProps } from './IFavorites';
 
 export default function Favorites({ isAuthenticated, onSongSelect, playingSongId, isPlaying, togglePlayPause, songs, playlists, 
-    fetchSongsFromPlaylist, fetchSongsFromArtist, fetchLikedSongs }: FavoritesProps) {
+    fetchSongsFromPlaylist, fetchSongsFromArtist, fetchLikedSongs, isSongsLoading }: FavoritesProps) {
 
     useEffect(() => {
         fetchLikedSongs();
     }, []);
+
+    if (isSongsLoading) {
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                <CircularProgress />
+            </div>
+        );
+    }
 
     if (songs.length === 0) {
         return (

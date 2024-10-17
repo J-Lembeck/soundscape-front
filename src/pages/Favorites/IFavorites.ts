@@ -13,4 +13,5 @@ export interface FavoritesProps {
     fetchSongsFromPlaylist: (playlistId: number | string | undefined) => void;
     fetchSongsFromArtist: (artistId: number | string | undefined) => void;
     fetchLikedSongs: () => void;
+    isSongsLoading: boolean;
 }

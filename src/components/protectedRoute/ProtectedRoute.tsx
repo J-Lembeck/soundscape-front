@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import api from '../../services/api';
+import { CircularProgress } from '@mui/material';
 
 interface ProtectedRouteProps {
     children: JSX.Element;
@@ -32,7 +33,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     }, [token]);
 
     if (isAuthenticated === null) {
-        return <div>Loading...</div>;
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                <CircularProgress />
+            </div>
+        );
     }
 
     if (!isAuthenticated) {
