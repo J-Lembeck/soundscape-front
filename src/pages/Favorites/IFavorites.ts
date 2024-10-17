@@ -1,7 +1,7 @@
-import { ArtistDTO } from "../../pages/artists/IArtist";
-import { PlaylistDetails } from "../sideBar/ISidebar";
+import { PlaylistDetails } from "../../components/sideBar/ISidebar";
+import SongDetails from "../../components/songList/ISongList";
 
-export interface SongListProps {
+export interface FavoritesProps {
     isAuthenticated: boolean;
     onSongSelect: (songId: number) => void;
     playingSongId?: number;
@@ -9,19 +9,8 @@ export interface SongListProps {
     togglePlayPause: () => void;
     songs: SongDetails[];
     playlists: PlaylistDetails[];
-    isPlaylist?: boolean;
     isArtist?: boolean;
     fetchSongsFromPlaylist: (playlistId: number | string | undefined) => void;
     fetchSongsFromArtist: (artistId: number | string | undefined) => void;
-    fetchLikedSongs?: () => void;
-}
-
-export default interface SongDetails {
-    id: number;
-    title: string;
-    artist: ArtistDTO;
-    creationDate: string;
-    length: number;
-    imageUrl: string;
-    isLiked: boolean;
+    fetchLikedSongs: () => void;
 }

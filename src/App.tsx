@@ -15,6 +15,7 @@ import { NotificationProvider, NotificationType, useNotification } from './utils
 import Playlists from './pages/playlists/Playlists';
 import Home from './pages/home/Home';
 import Artists from './pages/artists/Artists';
+import Favorites from './pages/Favorites/Favorites';
 
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -182,6 +183,34 @@ function App() {
         }
     };
 
+    const fetchLikedSongs = async () => {
+        if(isAuthenticated) {
+            try {
+                const response = await api.get<SongDetails[]>(`/songs/findLikedSongs`);
+                const backendUrl = process.env.REACT_APP_API_URL;
+    
+                const songsWithImageUrl = response.data.map((song) => ({
+                    ...song,
+                    imageUrl: `${backendUrl}/songs/load/image?id=${song.id}`
+                }));
+    
+                setSongs(songsWithImageUrl);            
+            } catch (error) {
+                if (error instanceof Error) {
+                    showNotification({
+                        type: NotificationType.ERROR,
+                        content: 'Falha ao carregar músicas curtidas: ' + error.message,
+                    });
+                } else {
+                    showNotification({
+                        type: NotificationType.ERROR,
+                        content: 'Falha ao carregar músicas curtidas: Ocorreu um erro desconhecido.',
+                    });
+                }
+            }
+        }
+    };
+
     const handleTogglePlayPause = () => {
         if (playerRef.current) {
             playerRef.current.togglePlayPause();
@@ -268,17 +297,20 @@ function App() {
                         <Route
                             path="/favorites"
                             element={
-                                <Artists
-                                    isAuthenticated={isAuthenticated}
-                                    onSongSelect={handleSongSelect}
-                                    playingSongId={selectedSongId}
-                                    isPlaying={isPlaying}
-                                    togglePlayPause={handleTogglePlayPause}
-                                    songs={songs}
-                                    playlists={playlists}
-                                    fetchSongsFromPlaylist={fetchSongsFromPlaylist}
-                                    fetchSongsFromArtist={fetchSongsFromArtist}
-                                />
+                                <ProtectedRoute>
+                                    <Favorites
+                                        isAuthenticated={isAuthenticated}
+                                        onSongSelect={handleSongSelect}
+                                        playingSongId={selectedSongId}
+                                        isPlaying={isPlaying}
+                                        togglePlayPause={handleTogglePlayPause}
+                                        songs={songs}
+                                        playlists={playlists}
+                                        fetchSongsFromPlaylist={fetchSongsFromPlaylist}
+                                        fetchSongsFromArtist={fetchSongsFromArtist}
+                                        fetchLikedSongs={fetchLikedSongs}
+                                    />
+                                </ProtectedRoute>
                             }
                         />
                         <Route
