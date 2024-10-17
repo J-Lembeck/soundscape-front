@@ -6,8 +6,9 @@ import api from '../../services/api';
 import { NotificationType, useNotification } from '../../utils/notifications/NotificationContext';
 import { ArtistDTO } from '../../pages/artists/IArtist';
 import { IUploadFileProps } from './IUploadFile';
+import axios from 'axios';
 
-export default function UploadFile({fetchSongsFromArtist}: IUploadFileProps) {
+export default function UploadFile({ fetchSongsFromArtist }: IUploadFileProps) {
     const [title, setTitle] = useState<string>('');
     const [isUploading, setIsUploading] = useState(false);
     const [audioFile, setAudioFile] = useState<File | null>(null);
@@ -17,6 +18,10 @@ export default function UploadFile({fetchSongsFromArtist}: IUploadFileProps) {
     const imageInputRef = useRef<HTMLInputElement | null>(null);
     const { showNotification } = useNotification();
     const navigate = useNavigate();
+
+    const errorMessagesMap: { [key: string]: string } = {
+        "Upload failed: The song matches a copyrighted song:": "Falha no upload: A música enviada coincide com uma música protegida por direitos autorais:"
+    };
 
     const handleAudioFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files) {
@@ -62,6 +67,7 @@ export default function UploadFile({fetchSongsFromArtist}: IUploadFileProps) {
                     type: NotificationType.WARNING,
                     content: 'Por favor, preencha todos os campos.',
                 });
+                setIsUploading(false);
                 return;
             }
 
@@ -70,7 +76,6 @@ export default function UploadFile({fetchSongsFromArtist}: IUploadFileProps) {
             formData.append('audioFile', audioFile);
             if (imageFile) formData.append('imageFile', imageFile);
 
-        
             const response = await api.post('/songs/upload', formData);
             showNotification({
                 type: NotificationType.SUCCESS,
@@ -78,21 +83,45 @@ export default function UploadFile({fetchSongsFromArtist}: IUploadFileProps) {
             });
             await handleOpenMyProfile();
         } catch (error) {
-            if (error instanceof Error) {
-                showNotification({
-                    type: NotificationType.ERROR,
-                    content: 'Falha no upload: ' + error.message,
-                });
+            setIsUploading(false);
+
+            if (axios.isAxiosError(error)) {
+                if (error.response) {
+                    const statusCode = error.response.status;
+                    const responseData = error.response.data;
+
+                    let backendMessage = '';
+                    if (typeof responseData === 'string') {
+                        backendMessage = responseData;
+                    } else if (responseData && responseData.message) {
+                        backendMessage = responseData.message;
+                    }
+
+                    let translatedMessage = 'Falha no upload: Ocorreu um erro.';
+                    for (const [englishMessage, portugueseMessage] of Object.entries(errorMessagesMap)) {
+                        if (backendMessage.startsWith(englishMessage)) {
+                            translatedMessage = backendMessage.replace(englishMessage, portugueseMessage);
+                            break;
+                        }
+                    }
+
+                    showNotification({
+                        type: NotificationType.ERROR,
+                        content: translatedMessage,
+                    });
+                } else {
+                    showNotification({
+                        type: NotificationType.ERROR,
+                        content: 'Falha no upload: Não foi possível conectar ao servidor.',
+                    });
+                }
             } else {
                 showNotification({
                     type: NotificationType.ERROR,
                     content: 'Falha no upload: Ocorreu um erro desconhecido.',
                 });
             }
-        } finally {
-            setIsUploading(false);
         }
-        
     };
 
     return (
@@ -154,7 +183,13 @@ export default function UploadFile({fetchSongsFromArtist}: IUploadFileProps) {
                         )}
                     </Box>
 
-                    <Button variant="contained" color="primary" onClick={handleUpload} fullWidth disabled={isUploading}>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleUpload}
+                        fullWidth
+                        disabled={isUploading}
+                    >
                         {isUploading ? 'Enviando...' : 'Enviar'}
                     </Button>
                 </Box>
