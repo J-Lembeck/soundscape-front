@@ -16,6 +16,7 @@ import Playlists from './pages/playlists/Playlists';
 import Home from './pages/home/Home';
 import Artists from './pages/artists/Artists';
 import Favorites from './pages/Favorites/Favorites';
+import Register from './pages/register/Register';
 
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -84,10 +85,12 @@ function App() {
 
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
-            fetchSongs();
+            if (location.pathname !== '/login' && searchValue) {
+                fetchSongs();
 
-            if (location.pathname !== '/home') {
-                navigate('/home');
+                if (location.pathname !== '/' && searchValue) {
+                    navigate('/');
+                }
             }
         }, 500);
 
@@ -95,11 +98,7 @@ function App() {
     }, [searchValue]);
 
     useEffect(() => {
-        fetchSongs();
-    }, []);
-
-    useEffect(() => {
-        if (location.pathname === '/home') {
+        if (location.pathname === '/') {
             fetchSongs();
         }
     }, [location.pathname]);
@@ -116,11 +115,15 @@ function App() {
     };
 
     useEffect(() => {
-        if(!isAuthenticated) return;
+        if(!isAuthenticated) {
+            setIsPlaylistsLoading(false);
+            return;
+        }
+        
 
         const fetchPlaylists = async () => {
             try {
-                setIsPlaylistsLoading(true)
+                setIsPlaylistsLoading(true);
                 const response = await api.get<PlaylistDetails[]>('/playlist/findAllByLoggedUser');
                 setPlaylists(response.data);
             } catch (error) {
@@ -136,7 +139,7 @@ function App() {
                     });
                 }
             } finally {
-                setIsPlaylistsLoading(false)
+                setIsPlaylistsLoading(false);
             }
         };
 
@@ -253,7 +256,7 @@ function App() {
         navigate(`/playlist/${playlistId}`);
     };
 
-    const shouldShowComponents = location.pathname !== '/';
+    const shouldShowComponents = (location.pathname !== '/login' && location.pathname !== '/register');
 
     return (
         <div style={{ display: 'flex', height: '100vh' }}>
@@ -266,7 +269,7 @@ function App() {
                     isPlaylistsLoading={isPlaylistsLoading}
                 />
             )}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
                 {shouldShowComponents && (
                     <Menu 
                         searchValue={searchValue}
@@ -275,11 +278,12 @@ function App() {
                         isAuthenticated={isAuthenticated} 
                     />
                 )}
-                <div style={{ flex: 1 }}>
+                <div style={{ flex: 1, overflowY: 'auto', paddingBottom: '90px'  }}>
                     <Routes>
-                        <Route path="/" element={<Login setIsAuthenticated={setIsAuthenticated}/>} />
+                        <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated}/>} />
+                        <Route path="/register" element={<Register />} />
                         <Route
-                            path="/home"
+                            path="/"
                             element={
                                 <Home
                                     isAuthenticated={isAuthenticated}

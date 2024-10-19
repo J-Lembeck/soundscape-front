@@ -294,7 +294,7 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong, isAuthenticated 
                 <IconButton onClick={togglePlayPause} aria-label="play-pause" disabled={!currentSong}>
                     {isPlaying ? <PauseCircleFilled fontSize="large" style={{ width: 50, height: 50, color: "#2F184B" }} /> : <PlayCircleFilled fontSize="large" style={{ width: 50, height: 50, color: "#2F184B" }} />}
                 </IconButton>
-                <Box display="flex" alignItems="center">
+                <Box display="flex" alignItems="center" >
                     <Typography variant="caption">{`${Math.floor(currentTime / 60)}:${(currentTime % 60).toFixed(0).padStart(2, '0')}`}</Typography>
                     <Slider
                         value={currentTime}
@@ -302,9 +302,16 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong, isAuthenticated 
                         max={duration}
                         onChange={handleSliderChange}
                         aria-labelledby="audio-slider"
-                        sx={{ width: 500, mx: 2 }}
+                        sx={{ 
+                            width: 500, 
+                            ml: 2, 
+                            color: "#2F184B",
+                            '& .MuiSlider-thumb': {
+                                display: 'none',
+                            },
+                        }}
                     />
-                    <Typography variant="caption">{`${Math.floor(duration / 60)}:${(duration % 60).toFixed(0).padStart(2, '0')}`}</Typography>
+                    <Typography style={{marginLeft: "16px"}} variant="caption">{`${Math.floor(duration / 60)}:${(duration % 60).toFixed(0).padStart(2, '0')}`}</Typography>
                 </Box>
 
             </Box>
@@ -320,7 +327,14 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong, isAuthenticated 
                     step={0.01}
                     onChange={handleVolumeChange}
                     aria-labelledby="volume-slider"
-                    sx={{ width: 100, ml: 1 }}
+                    sx={{ 
+                        width: 100, 
+                        ml: 1, 
+                        color: "#2F184B",
+                        '& .MuiSlider-thumb': {
+                            display: 'none',
+                        },
+                    }}
                 />
             </Box>
         </Box>

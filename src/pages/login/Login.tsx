@@ -1,16 +1,22 @@
 import React, { useState } from 'react';
-import { Box, Button, TextField, Typography, Container, Alert } from '@mui/material';
+import { Box, Button, TextField, Typography, Container, Alert, InputAdornment, IconButton } from '@mui/material';
 import api from '../../services/api';
 import { useNavigate } from 'react-router-dom';
 import { NotificationType, useNotification } from '../../utils/notifications/NotificationContext';
 import { ILoginProps } from './ILogin';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 export default function Login({setIsAuthenticated}: ILoginProps) {
     const [username, setUsername] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
+    const [showPassword, setShowPassword] = useState<boolean>(false);
     const navigate = useNavigate();
     const { showNotification } = useNotification();
+
+    const handleClickShowPassword = () => {
+        setShowPassword(!showPassword);
+    };
 
     const handleLogin = async () => {
         try {
@@ -20,7 +26,7 @@ export default function Login({setIsAuthenticated}: ILoginProps) {
             setIsAuthenticated(true);
 
             setError(null);
-            navigate('/home');
+            navigate('/');
         } catch (error) {
             if (error instanceof Error) {
                 showNotification({
@@ -53,12 +59,24 @@ export default function Login({setIsAuthenticated}: ILoginProps) {
                 />
                 <TextField
                     label="Senha"
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     variant="outlined"
                     fullWidth
                     margin="normal"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    InputProps={{
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <IconButton
+                                    onClick={handleClickShowPassword}
+                                    edge="end"
+                                >
+                                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                                </IconButton>
+                            </InputAdornment>
+                        ),
+                    }}
                 />
                 <Button
                     variant="contained"
@@ -68,6 +86,15 @@ export default function Login({setIsAuthenticated}: ILoginProps) {
                     sx={{ mt: 2 }}
                 >
                     Entrar
+                </Button>
+                <Button
+                    variant="text"
+                    color="primary"
+                    fullWidth
+                    onClick={() => navigate('/register')}
+                    sx={{ mt: 2 }}
+                >
+                    Cadastrar-se
                 </Button>
             </Box>
         </Container>
