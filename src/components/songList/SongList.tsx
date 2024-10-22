@@ -5,7 +5,7 @@ import PauseIcon from '@mui/icons-material/Pause';
 import AddIcon from '@mui/icons-material/Add';
 import { SongListProps } from './ISongList';
 import api from '../../services/api';
-import { Album, CalendarMonth, Delete, LockClock, PunchClock, QueryBuilder, QueueMusic, SentimentVeryDissatisfied, Subscriptions } from '@mui/icons-material';
+import { Album, CalendarMonth, Delete, Favorite, LockClock, PunchClock, QueryBuilder, QueueMusic, SentimentVeryDissatisfied, Subscriptions } from '@mui/icons-material';
 import { useNavigate, useParams } from 'react-router-dom';
 import SongImage from '../../utils/songImages/SongImage';
 import { NotificationType, useNotification } from '../../utils/notifications/NotificationContext';
@@ -152,6 +152,10 @@ export default function SongList({ isAuthenticated, onSongSelect, playingSongId,
                                         </Typography>
                                     </ButtonBase>
                                 </CardContent>
+                                <Typography variant="body2" color="text.secondary" style={{ marginRight: "3rem" }} display={"flex"} alignItems={"center"}>
+                                    <Favorite style={{ paddingRight: "0.5rem" }} />
+                                    {song.likes}
+                                </Typography>
                                 <Typography variant="body2" color="text.secondary" style={{ marginRight: "3rem" }} display={"flex"} alignItems={"center"}>
                                     <CalendarMonth style={{ paddingRight: "0.5rem" }} />
                                     {formatDate(song.creationDate)}

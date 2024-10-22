@@ -22,6 +22,7 @@ export default interface SongDetails {
     artist: ArtistDTO;
     creationDate: string;
     length: number;
+    likes: number;
     imageUrl: string;
     isLiked: boolean;
 }
