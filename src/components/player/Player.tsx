@@ -120,7 +120,7 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong, isAuthenticated 
 
         mediaSource.addEventListener('sourceopen', handleSourceOpen);
 
-        const websocket = new WebSocket('ws://localhost:8080/audio-stream');
+        const websocket = new WebSocket(process.env.REACT_APP_STREAM_API_URL + '/audio-stream');
         websocketRef.current = websocket;
         websocket.binaryType = 'arraybuffer';
 
