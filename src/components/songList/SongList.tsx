@@ -46,24 +46,38 @@ export default function SongList({ isAuthenticated, onSongSelect, playingSongId,
                 await api.put(`/playlist/addSongToPlaylist?playlistId=${playlistId}&songId=${selectedSongId}`);
                 showNotification({
                     type: NotificationType.SUCCESS,
-                    content: 'Música adicionada a playlist com sucesso.'
+                    content: 'Música adicionada à playlist com sucesso.',
                 });
                 handleClosePopover();
             } catch (error) {
-                if (error instanceof Error) {
+                if (typeof error === 'object' && error !== null && 'response' in error) {
+                    const response = (error as any).response;
+                    if (response.status === 400) {
+                        showNotification({
+                            type: NotificationType.ERROR,
+                            content: 'Essa música já está nesta playlist.',
+                        });
+                    } else {
+                        showNotification({
+                            type: NotificationType.ERROR,
+                            content: 'Falha ao adicionar música à playlist: ' + response.statusText,
+                        });
+                    }
+                } else if (error instanceof Error) {
                     showNotification({
                         type: NotificationType.ERROR,
-                        content: 'Falha ao adicionar música a playlist: ' + error.message,
+                        content: 'Falha ao adicionar música à playlist: ' + error.message,
                     });
                 } else {
                     showNotification({
                         type: NotificationType.ERROR,
-                        content: 'Falha ao adicionar música a playlist: Ocorreu um erro desconhecido.',
+                        content: 'Falha ao adicionar música à playlist: Ocorreu um erro desconhecido.',
                     });
                 }
             }
         }
     };
+    
 
     const handleRemoveFromPlaylist = async (event: React.MouseEvent<HTMLElement>, songId: number) => {
         if (playlistId) {

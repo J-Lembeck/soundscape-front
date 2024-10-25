@@ -17,6 +17,7 @@ export default function Artists({ isAuthenticated, onSongSelect, playingSongId, 
 
     async function fetchArtist(artistId: string) {
         const response = await api.get<ArtistDTO>(`/artists/findById?artistId=${artistId}`)
+        fetchSongsFromArtist(artistId);
         setSelectedArtist(response.data);
     }
 
@@ -68,7 +69,7 @@ export default function Artists({ isAuthenticated, onSongSelect, playingSongId, 
                 togglePlayPause={togglePlayPause}
                 songs={songs}
                 playlists={playlists}
-                isPlaylist={true}
+                isPlaylist={false}
                 isArtist={true}
                 fetchSongsFromPlaylist={fetchSongsFromPlaylist}
                 fetchSongsFromArtist={fetchSongsFromArtist}

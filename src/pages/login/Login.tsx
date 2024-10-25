@@ -42,11 +42,28 @@ export default function Login({setIsAuthenticated}: ILoginProps) {
         }
     };
 
+    const inputStyle = {
+        '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+                borderColor: 'gray',
+            },
+            '&.Mui-focused fieldset': {
+                borderColor: '#4B306A',
+            },
+        },
+        '& .MuiInputLabel-root': {
+            color: 'gray',
+        },
+        '& .MuiInputLabel-root.Mui-focused': {
+            color: '#4B306A',
+        }
+    }
+
     return (
         <Container maxWidth="xs">
             <Box display="flex" flexDirection="column" alignItems="center" mt={8}>
                 <Typography variant="h5" mb={2}>
-                    Login
+                    Soundscape
                 </Typography>
                 {error && <Alert severity="error">{error}</Alert>}
                 <TextField
@@ -56,6 +73,7 @@ export default function Login({setIsAuthenticated}: ILoginProps) {
                     margin="normal"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
+                    sx={inputStyle}
                 />
                 <TextField
                     label="Senha"
@@ -65,6 +83,7 @@ export default function Login({setIsAuthenticated}: ILoginProps) {
                     margin="normal"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    sx={inputStyle}
                     InputProps={{
                         endAdornment: (
                             <InputAdornment position="end">
@@ -80,7 +99,7 @@ export default function Login({setIsAuthenticated}: ILoginProps) {
                 />
                 <Button
                     variant="contained"
-                    color="primary"
+                    style={{backgroundColor: "#4B306A"}}
                     fullWidth
                     onClick={handleLogin}
                     sx={{ mt: 2 }}
@@ -89,7 +108,7 @@ export default function Login({setIsAuthenticated}: ILoginProps) {
                 </Button>
                 <Button
                     variant="text"
-                    color="primary"
+                    style={{color: "#4B306A"}}
                     fullWidth
                     onClick={() => navigate('/register')}
                     sx={{ mt: 2 }}

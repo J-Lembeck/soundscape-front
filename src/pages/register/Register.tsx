@@ -65,11 +65,28 @@ export default function Register() {
         setShowConfirmPassword(!showConfirmPassword);
     };
 
+    const inputStyle = {
+        '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+                borderColor: 'gray',
+            },
+            '&.Mui-focused fieldset': {
+                borderColor: '#4B306A',
+            },
+        },
+        '& .MuiInputLabel-root': {
+            color: 'gray',
+        },
+        '& .MuiInputLabel-root.Mui-focused': {
+            color: '#4B306A',
+        }
+    }
+
     return (
         <Container maxWidth="xs">
             <Box display="flex" flexDirection="column" alignItems="center" mt={8}>
                 <Typography variant="h5" mb={2}>
-                    Cadastro
+                    Soundscape
                 </Typography>
                 {error && <Alert severity="error">{error}</Alert>}
                 <TextField
@@ -78,6 +95,7 @@ export default function Register() {
                     fullWidth
                     margin="normal"
                     value={name}
+                    sx={inputStyle}
                     onChange={(e) => setName(e.target.value)}
                 />
                 <TextField
@@ -87,6 +105,7 @@ export default function Register() {
                     fullWidth
                     margin="normal"
                     value={email}
+                    sx={inputStyle}
                     onChange={(e) => setEmail(e.target.value)}
                 />
                 <TextField
@@ -96,6 +115,7 @@ export default function Register() {
                     fullWidth
                     margin="normal"
                     value={password}
+                    sx={inputStyle}
                     onChange={(e) => setPassword(e.target.value)}
                     InputProps={{
                         endAdornment: (
@@ -117,6 +137,7 @@ export default function Register() {
                     fullWidth
                     margin="normal"
                     value={confirmPassword}
+                    sx={inputStyle}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     InputProps={{
                         endAdornment: (
@@ -133,7 +154,7 @@ export default function Register() {
                 />
                 <Button
                     variant="contained"
-                    color="primary"
+                    style={{backgroundColor: "#4B306A"}}
                     fullWidth
                     onClick={handleRegister}
                     sx={{ mt: 2 }}
@@ -142,7 +163,7 @@ export default function Register() {
                 </Button>
                 <Button
                     variant="text"
-                    color="primary"
+                    style={{color: "#4B306A"}}
                     fullWidth
                     onClick={() => navigate('/login')}
                     sx={{ mt: 2 }}

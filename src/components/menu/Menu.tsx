@@ -76,7 +76,13 @@ export default function Menu({searchValue, setSearchValue, fetchSongsFromArtist,
             <div>
                 <Box display={"flex"} flexDirection={"row"} alignContent={"center"} alignItems={"center"}>
                     <Typography> 
-                        {isAuthenticated ? localStorage.getItem("username") : "Fazer login"}
+                        {isAuthenticated ? 
+                            localStorage.getItem("username") 
+                        : 
+                            <Link to="/login" style={{ textDecoration: 'none', color: '#4B306A' }}>
+                                Fazer login
+                            </Link>
+                        }
                     </Typography>
                     <IconButton onClick={handlePopoverOpen}>
                         <Avatar style={{ backgroundColor: '#4B306A', paddingRight: 0 }}>

@@ -59,7 +59,7 @@ export default function Favorites({ isAuthenticated, onSongSelect, playingSongId
                 togglePlayPause={togglePlayPause}
                 songs={songs}
                 playlists={playlists}
-                isPlaylist={true}
+                isPlaylist={false}
                 isArtist={true}
                 fetchSongsFromPlaylist={fetchSongsFromPlaylist}
                 fetchSongsFromArtist={fetchSongsFromArtist}

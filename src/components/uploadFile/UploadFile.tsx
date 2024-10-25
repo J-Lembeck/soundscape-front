@@ -172,7 +172,7 @@ export default function UploadFile({ fetchSongsFromArtist }: IUploadFileProps) {
                     />
 
                     <Box display="flex" flexDirection="column" gap={1}>
-                        <Button variant="contained" component="label" fullWidth startIcon={<AudioFile />}>
+                        <Button variant="contained" component="label" fullWidth startIcon={<AudioFile />} style={{backgroundColor: "#4B306A"}}>
                             Enviar arquivo de áudio
                             <input type="file" hidden accept="audio/*" onChange={handleAudioFileChange} />
                         </Button>
@@ -185,10 +185,10 @@ export default function UploadFile({ fetchSongsFromArtist }: IUploadFileProps) {
 
                     <Button
                         variant="contained"
-                        color="primary"
                         onClick={handleUpload}
                         fullWidth
                         disabled={isUploading}
+                        style={{backgroundColor: "#4B306A"}}
                     >
                         {isUploading ? 'Enviando...' : 'Enviar'}
                     </Button>
