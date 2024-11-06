@@ -26,6 +26,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
             } catch (err) {
                 setIsAuthenticated(false);
                 localStorage.removeItem('token');
+                localStorage.removeItem('username');
             }
         };
 

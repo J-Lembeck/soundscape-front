@@ -49,6 +49,8 @@ function App() {
             });
             setIsAuthenticated(response.data);
         } catch (error) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('username');
             setIsAuthenticated(false);
         }
     };
