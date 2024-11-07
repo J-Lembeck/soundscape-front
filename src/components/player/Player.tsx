@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useImperativeHandle, forwardRef } from 'react';
-import { Slider, Typography, IconButton, Box } from '@mui/material';
+import { Slider, Typography, IconButton, Box, CircularProgress } from '@mui/material';
 import api from "../../services/api";
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
@@ -15,6 +15,7 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong, isAuthenticated 
     const [isPlaying, setPlaying] = useState<boolean>(false);
     const [imageError, setImageError] = useState(false);
     const [isLiked, setIsLiked] = useState<boolean>(false);
+    const [isLiking, setIsLiking] = useState<boolean>(false);
     const { showNotification } = useNotification();
     const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
     const websocketRef = useRef<WebSocket | null>(null);
@@ -39,8 +40,12 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong, isAuthenticated 
         if (audioPlayerRef.current) {
             audioPlayerRef.current.volume = volume;
         }
-        setIsLiked(currentSong?.isLiked ? true : false);
-    }, [currentSong]);
+
+        if (currentSong) {
+            console.log("aaaaa")
+            setIsLiked(currentSong.isLiked ? true : false);
+        }
+    }, [songId]);
 
     const stopPlayback = (callback?: () => void) => {
         const audioPlayer = audioPlayerRef.current;
@@ -187,9 +192,12 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong, isAuthenticated 
             return;
         }
 
+        setIsLiking(true);
+
         try {
             await api.put(`/songs/likeSong?songId=${currentSong.id}`);
-            setIsLiked(!currentSong.isLiked); 
+            console.log("bbbbb")
+            setIsLiked(!isLiked); 
             showNotification({
                 type: NotificationType.SUCCESS,
                 content: 'Música curtida com sucesso.'
@@ -199,8 +207,11 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong, isAuthenticated 
                 type: NotificationType.ERROR,
                 content: 'Falha ao curtir a música.'
             });
+        } finally {
+            setIsLiking(false);
         }
     };
+    
 
     const PlaceholderBox = (
         <Box
@@ -279,11 +290,17 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong, isAuthenticated 
                                 {currentSong.artist.name}
                             </Typography>
                         </Box>
-                        <IconButton onClick={handleLikeSong}>
-                            {isLiked ? (
-                                <FavoriteIcon style={{ color: "#2F184B" }} />
+                        <IconButton onClick={handleLikeSong} disabled={isLiking}>
+                            {isLiking ? (
+                                <CircularProgress size={24} style={{ color: "#2F184B" }} />
                             ) : (
-                                <FavoriteBorderIcon style={{ color: "#2F184B" }} />
+                                <>
+                                    {isLiked ? (
+                                        <FavoriteIcon style={{ color: "#2F184B" }} />
+                                    ) : (
+                                        <FavoriteBorderIcon style={{ color: "#2F184B" }} />
+                                    )}
+                                </>
                             )}
                         </IconButton>
                     </Box>

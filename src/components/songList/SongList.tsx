@@ -77,7 +77,6 @@ export default function SongList({ isAuthenticated, onSongSelect, playingSongId,
             }
         }
     };
-    
 
     const handleRemoveFromPlaylist = async (event: React.MouseEvent<HTMLElement>, songId: number) => {
         if (playlistId) {
