@@ -48,6 +48,10 @@ function App() {
                 }
             });
             setIsAuthenticated(response.data);
+            if(!response.data) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('username');
+            }
         } catch (error) {
             localStorage.removeItem('token');
             localStorage.removeItem('username');

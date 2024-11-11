@@ -4,7 +4,7 @@ import api from "../../services/api";
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
-import { Album, PauseCircleFilled, PlayCircleFilled } from '@mui/icons-material';
+import { Album, Download, PauseCircleFilled, PlayCircleFilled } from '@mui/icons-material';
 import { PlayerProps } from './IPlayer';
 import { NotificationType, useNotification } from '../../utils/notifications/NotificationContext';
 
@@ -16,6 +16,7 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong, isAuthenticated 
     const [imageError, setImageError] = useState(false);
     const [isLiked, setIsLiked] = useState<boolean>(false);
     const [isLiking, setIsLiking] = useState<boolean>(false);
+    const [isDownloading, setIsDownloading] = useState<boolean>(false);
     const { showNotification } = useNotification();
     const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
     const websocketRef = useRef<WebSocket | null>(null);
@@ -211,8 +212,47 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong, isAuthenticated 
             setIsLiking(false);
         }
     };
-    
 
+    const handleDownloadSong = async () => {
+        if (!currentSong) return;
+    
+        setIsDownloading(true);
+    
+        try {
+            const response = await api.get(`/songs/downloadSong?songId=${currentSong.id}`, {
+                responseType: 'blob' // Definimos 'blob' para que a resposta seja tratada como um arquivo binário
+            });
+    
+            // Criar uma URL a partir do blob de resposta
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            
+            // Criar um link temporário para simular o download
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `${currentSong.title}.mp3`); // Defina o nome do arquivo baixado
+            document.body.appendChild(link);
+            link.click();
+    
+            // Verificar se o link ainda possui um parentNode antes de remover
+            if (link.parentNode) {
+                link.parentNode.removeChild(link);
+            }
+            window.URL.revokeObjectURL(url);
+    
+            showNotification({
+                type: NotificationType.SUCCESS,
+                content: 'Download efetuado com sucesso.'
+            });
+        } catch (error) {
+            showNotification({
+                type: NotificationType.ERROR,
+                content: 'Falha ao efetuar download.'
+            });
+        } finally {
+            setIsDownloading(false);
+        }
+    };    
+    
     const PlaceholderBox = (
         <Box
             display="flex"
@@ -334,6 +374,15 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong, isAuthenticated 
             </Box>
 
             <Box display="flex" alignItems="center">
+                {isAuthenticated && (
+                    isDownloading ? (
+                        <CircularProgress size={24} style={{ color: "#2F184B" }} />
+                    ) : (
+                        <IconButton onClick={handleDownloadSong}>
+                            <Download style={{ color: "#2F184B" }} />
+                        </IconButton>
+                    )
+                )}
                 <IconButton>
                     <VolumeUpIcon style={{ color: "#2F184B" }} />
                 </IconButton>
