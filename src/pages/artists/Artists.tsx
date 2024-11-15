@@ -112,7 +112,7 @@ export default function Artists({ isAuthenticated, onSongSelect, playingSongId, 
     }
 
     return (
-        <Box padding={"32px"} paddingLeft={"3rem"} paddingRight={"3rem"} style={{ height: "calc(100vh - 116px)", overflowY: "auto" }}>
+        <Box padding={"32px"} paddingLeft={"3rem"} paddingRight={"3rem"} style={{ height: "calc(100vh - 116px)", overflowY: "auto" }} className={"scroll-custom"}>
             <Box display="flex" flexDirection="row" alignItems="flex-start" justifyContent="space-between">
                 <Box display="flex" flexDirection="column" flex={1} marginRight={2}>
                     <Box display="flex" alignItems="center" marginBottom={2} width={"100%"} justifyContent={"left"}>

@@ -9,7 +9,6 @@ import { CalendarMonth, Delete, Favorite, QueryBuilder } from '@mui/icons-materi
 import { useNavigate, useParams } from 'react-router-dom';
 import SongImage from '../../utils/songImages/SongImage';
 import { NotificationType, useNotification } from '../../utils/notifications/NotificationContext';
-import "./SongList.sass"
 
 export default function SongList({ isAuthenticated, onSongSelect, playingSongId, isPlaying, togglePlayPause, songs, playlists, isPlaylist, fetchSongsFromPlaylist, fetchSongsFromArtist }: SongListProps) {
     const [hoveredSongId, setHoveredSongId] = useState<number | null>(null);
@@ -131,7 +130,7 @@ export default function SongList({ isAuthenticated, onSongSelect, playingSongId,
     }
 
     return (
-        <Box style={{ overflowY: 'auto' }} className={"song-list-container"}>
+        <Box style={{ overflowY: 'auto' }}>
             <Grid container spacing={3} justifyContent="left">
                 {songs.map((song) => (
                     <Grid item xs={12} key={song.id}>

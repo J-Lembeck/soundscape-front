@@ -131,8 +131,8 @@ export default function UploadFile({ fetchSongsFromArtist }: IUploadFileProps) {
                     display="flex"
                     justifyContent="center"
                     alignItems="center"
-                    minWidth="200px"
-                    minHeight="200px"
+                    width="200px"
+                    height="200px"
                     border="1px dashed gray"
                     borderRadius="4px"
                     overflow="hidden"
@@ -162,7 +162,7 @@ export default function UploadFile({ fetchSongsFromArtist }: IUploadFileProps) {
                     </IconButton>
                 </Box>
 
-                <Box display="flex" flexDirection="column" gap={2} width="100%">
+                <Box display="flex" flexDirection="column" gap={2} width="80%">
                     <TextField
                         label="Título"
                         variant="outlined"

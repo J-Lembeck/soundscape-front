@@ -45,7 +45,7 @@ export default function Playlists({ isAuthenticated, onSongSelect, playingSongId
     }
 
     return (
-        <Box padding={"32px"} paddingLeft={"3rem"} paddingRight={"3rem"} height={"100%"} style={{height: "calc(100vh - 116px)", overflowY: "auto"}}>
+        <Box padding={"32px"} paddingLeft={"3rem"} paddingRight={"3rem"} height={"100%"} style={{height: "calc(100vh - 116px)", overflowY: "auto"}} className={"scroll-custom"}>
             <Box display="flex" flexDirection="row" alignItems="center" marginBottom={2}>
                 <QueueMusic style={{ marginRight: '8px', width: 40, height: 40, color: "#2F184B" }} />
                 <Typography gutterBottom margin={0}>
