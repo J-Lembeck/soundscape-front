@@ -265,88 +265,35 @@ function App() {
     const shouldShowComponents = (location.pathname !== '/login' && location.pathname !== '/register');
 
     return (
-        <div style={{ display: 'flex', height: '100vh' }}>
-            {shouldShowComponents && (
-                <Sidebar 
-                    playlists={playlists}
-                    setPlaylists={setPlaylists}
-                    onPlaylistSelect={handlePlaylistSelect}
-                    isAuthenticated={isAuthenticated}
-                    isPlaylistsLoading={isPlaylistsLoading}
-                />
-            )}
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+        <div style={{ display: 'flex', maxHeight: '100vh', flexDirection: "column" }}>
+            <div style={{display: "flex"}}>
                 {shouldShowComponents && (
-                    <Menu 
-                        searchValue={searchValue}
-                        setSearchValue={setSearchValue}
-                        fetchSongsFromArtist={fetchSongsFromArtist}
-                        isAuthenticated={isAuthenticated} 
+                    <Sidebar 
+                        playlists={playlists}
+                        setPlaylists={setPlaylists}
+                        onPlaylistSelect={handlePlaylistSelect}
+                        isAuthenticated={isAuthenticated}
+                        isPlaylistsLoading={isPlaylistsLoading}
                     />
                 )}
-                <div style={{ flex: 1, overflowY: 'auto', paddingBottom: '90px'  }}>
-                    <Routes>
-                        <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated}/>} />
-                        <Route path="/register" element={<Register />} />
-                        <Route
-                            path="/"
-                            element={
-                                <Home
-                                    isAuthenticated={isAuthenticated}
-                                    onSongSelect={handleSongSelect}
-                                    playingSongId={selectedSongId}
-                                    isPlaying={isPlaying}
-                                    togglePlayPause={handleTogglePlayPause}
-                                    songs={songs}
-                                    playlists={playlists}
-                                    fetchSongsFromPlaylist={fetchSongsFromPlaylist}
-                                    fetchSongsFromArtist={fetchSongsFromArtist}
-                                    isSongsLoading={isSongsLoading}
-                                />
-                            }
+        
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', height: "calc(100vh - 116px)" }}>
+                    {shouldShowComponents && (
+                        <Menu 
+                            searchValue={searchValue}
+                            setSearchValue={setSearchValue}
+                            fetchSongsFromArtist={fetchSongsFromArtist}
+                            isAuthenticated={isAuthenticated} 
                         />
-
-                        <Route
-                            path="/playlist/:id"
-                            element={
-                                <Playlists
-                                    isAuthenticated={isAuthenticated}
-                                    onSongSelect={handleSongSelect}
-                                    playingSongId={selectedSongId}
-                                    isPlaying={isPlaying}
-                                    togglePlayPause={handleTogglePlayPause}
-                                    songs={songs}
-                                    playlists={playlists}
-                                    fetchSongsFromPlaylist={fetchSongsFromPlaylist}
-                                    fetchSongsFromArtist={fetchSongsFromArtist}
-                                    isSongsLoading={isSongsLoading}
-                                />
-                            }
-                        />
-
-                        <Route
-                            path="/artist/:id"
-                            element={
-                                <Artists
-                                    isAuthenticated={isAuthenticated}
-                                    onSongSelect={handleSongSelect}
-                                    playingSongId={selectedSongId}
-                                    isPlaying={isPlaying}
-                                    togglePlayPause={handleTogglePlayPause}
-                                    songs={songs}
-                                    playlists={playlists}
-                                    fetchSongsFromPlaylist={fetchSongsFromPlaylist}
-                                    fetchSongsFromArtist={fetchSongsFromArtist}
-                                    isSongsLoading={isSongsLoading}
-                                />
-                            }
-                        />
-
-                        <Route
-                            path="/favorites"
-                            element={
-                                <ProtectedRoute>
-                                    <Favorites
+                    )}
+        
+                        <Routes>
+                            <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated}/>} />
+                            <Route path="/register" element={<Register />} />
+                            <Route
+                                path="/"
+                                element={
+                                    <Home
                                         isAuthenticated={isAuthenticated}
                                         onSongSelect={handleSongSelect}
                                         playingSongId={selectedSongId}
@@ -356,23 +303,76 @@ function App() {
                                         playlists={playlists}
                                         fetchSongsFromPlaylist={fetchSongsFromPlaylist}
                                         fetchSongsFromArtist={fetchSongsFromArtist}
-                                        fetchLikedSongs={fetchLikedSongs}
                                         isSongsLoading={isSongsLoading}
                                     />
-                                </ProtectedRoute>
-                            }
-                        />
-                        <Route
-                            path="/upload"
-                            element={
-                                <ProtectedRoute>
-                                    <UploadFile fetchSongsFromArtist={fetchSongsFromArtist}/>
-                                </ProtectedRoute>
-                            }
-                        />
-                    </Routes>
+                                }
+                            />
+                            <Route
+                                path="/playlist/:id"
+                                element={
+                                    <Playlists
+                                        isAuthenticated={isAuthenticated}
+                                        onSongSelect={handleSongSelect}
+                                        playingSongId={selectedSongId}
+                                        isPlaying={isPlaying}
+                                        togglePlayPause={handleTogglePlayPause}
+                                        songs={songs}
+                                        playlists={playlists}
+                                        fetchSongsFromPlaylist={fetchSongsFromPlaylist}
+                                        fetchSongsFromArtist={fetchSongsFromArtist}
+                                        isSongsLoading={isSongsLoading}
+                                    />
+                                }
+                            />
+                            <Route
+                                path="/artist/:id"
+                                element={
+                                    <Artists
+                                        isAuthenticated={isAuthenticated}
+                                        onSongSelect={handleSongSelect}
+                                        playingSongId={selectedSongId}
+                                        isPlaying={isPlaying}
+                                        togglePlayPause={handleTogglePlayPause}
+                                        songs={songs}
+                                        playlists={playlists}
+                                        fetchSongsFromPlaylist={fetchSongsFromPlaylist}
+                                        fetchSongsFromArtist={fetchSongsFromArtist}
+                                        isSongsLoading={isSongsLoading}
+                                    />
+                                }
+                            />
+                            <Route
+                                path="/favorites"
+                                element={
+                                    <ProtectedRoute>
+                                        <Favorites
+                                            isAuthenticated={isAuthenticated}
+                                            onSongSelect={handleSongSelect}
+                                            playingSongId={selectedSongId}
+                                            isPlaying={isPlaying}
+                                            togglePlayPause={handleTogglePlayPause}
+                                            songs={songs}
+                                            playlists={playlists}
+                                            fetchSongsFromPlaylist={fetchSongsFromPlaylist}
+                                            fetchSongsFromArtist={fetchSongsFromArtist}
+                                            fetchLikedSongs={fetchLikedSongs}
+                                            isSongsLoading={isSongsLoading}
+                                        />
+                                    </ProtectedRoute>
+                                }
+                            />
+                            <Route
+                                path="/upload"
+                                element={
+                                    <ProtectedRoute>
+                                        <UploadFile fetchSongsFromArtist={fetchSongsFromArtist}/>
+                                    </ProtectedRoute>
+                                }
+                            />
+                        </Routes>
                 </div>
-                {shouldShowComponents && (
+            </div>
+            {shouldShowComponents && (
                     <Player
                         ref={playerRef}
                         songId={selectedSongId}
@@ -381,9 +381,9 @@ function App() {
                         isAuthenticated={isAuthenticated}
                     />
                 )}
-            </div>
         </div>
     );
+    
 }
 
 function AppWrapper() {

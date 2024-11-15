@@ -1,5 +1,5 @@
 import { Typography, Box, CircularProgress } from '@mui/material';
-import { QueueMusic, SentimentVeryDissatisfied } from '@mui/icons-material';
+import { Height, QueueMusic, SentimentVeryDissatisfied } from '@mui/icons-material';
 import SongList from '../../components/songList/SongList';
 import { HomeProps } from './IHome';
 
@@ -9,7 +9,7 @@ export default function Home({ isAuthenticated, onSongSelect, playingSongId, isP
     if (isSongsLoading) {
         return (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                <CircularProgress />
+                <CircularProgress style={{color: "#2F184B"}} />
             </div>
         );
     }
@@ -39,7 +39,7 @@ export default function Home({ isAuthenticated, onSongSelect, playingSongId, isP
     }
 
     return (
-        <Box padding={"32px"} paddingLeft={"3rem"} paddingRight={"3rem"}>
+        <Box padding={"32px"} paddingLeft={"3rem"} paddingRight={"3rem"} style={{height: "calc(100vh - 116px)", overflowY: "auto"}}>
             <Box display="flex" flexDirection="row" alignItems="center" marginBottom={2}>
                 <QueueMusic style={{ marginRight: '8px', width: 40, height: 40, color: "#2F184B" }} />
                 <Typography margin={0} gutterBottom>

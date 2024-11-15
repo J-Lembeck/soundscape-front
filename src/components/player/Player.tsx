@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useImperativeHandle, forwardRef } from 'react';
-import { Slider, Typography, IconButton, Box, CircularProgress } from '@mui/material';
+import { Slider, Typography, IconButton, Box, CircularProgress, ButtonBase } from '@mui/material';
 import api from "../../services/api";
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
@@ -7,11 +7,14 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import { Album, Download, PauseCircleFilled, PlayCircleFilled } from '@mui/icons-material';
 import { PlayerProps } from './IPlayer';
 import { NotificationType, useNotification } from '../../utils/notifications/NotificationContext';
+import { useNavigate } from 'react-router-dom';
 
 const Player = forwardRef(({ songId, setIsPlaying, currentSong, isAuthenticated }: PlayerProps, ref) => {
     const [duration, setDuration] = useState<number>(0);
     const [currentTime, setCurrentTime] = useState<number>(0);
+    const [sliderCurrentTime, setSliderCurrentTime] = useState<number>(0); // Novo estado
     const [volume, setVolume] = useState<number>(0.7);
+    const [sliderVolume, setSliderVolume] = useState<number>(0.7); // Novo estado
     const [isPlaying, setPlaying] = useState<boolean>(false);
     const [imageError, setImageError] = useState(false);
     const [isLiked, setIsLiked] = useState<boolean>(false);
@@ -23,6 +26,7 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong, isAuthenticated 
     const mediaSourceRef = useRef<MediaSource | null>(null);
     const sourceBufferRef = useRef<SourceBuffer | null>(null);
     const queueRef = useRef<ArrayBuffer[]>([]);
+    const navigate = useNavigate();
 
     useImperativeHandle(ref, () => ({
         togglePlayPause() {
@@ -43,7 +47,6 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong, isAuthenticated 
         }
 
         if (currentSong) {
-            console.log("aaaaa")
             setIsLiked(currentSong.isLiked ? true : false);
         }
     }, [songId]);
@@ -85,6 +88,10 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong, isAuthenticated 
     };
 
     const handleSliderChange = (event: Event, value: number | number[]) => {
+        setSliderCurrentTime(value as number);
+    };
+
+    const handleSliderChangeCommitted = (event: React.SyntheticEvent | Event, value: number | number[]) => {
         setCurrentTime(value as number);
         if (audioPlayerRef.current) {
             audioPlayerRef.current.currentTime = value as number;
@@ -92,6 +99,10 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong, isAuthenticated 
     };
 
     const handleVolumeChange = (event: Event, value: number | number[]) => {
+        setSliderVolume(value as number);
+    };
+
+    const handleVolumeChangeCommitted = (event: React.SyntheticEvent | Event, value: number | number[]) => {
         setVolume(value as number);
         if (audioPlayerRef.current) {
             audioPlayerRef.current.volume = value as number;
@@ -197,7 +208,6 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong, isAuthenticated 
 
         try {
             await api.put(`/songs/likeSong?songId=${currentSong.id}`);
-            console.log("bbbbb")
             setIsLiked(!isLiked); 
             showNotification({
                 type: NotificationType.SUCCESS,
@@ -220,20 +230,17 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong, isAuthenticated 
     
         try {
             const response = await api.get(`/songs/downloadSong?songId=${currentSong.id}`, {
-                responseType: 'blob' // Definimos 'blob' para que a resposta seja tratada como um arquivo binário
+                responseType: 'blob'
             });
     
-            // Criar uma URL a partir do blob de resposta
             const url = window.URL.createObjectURL(new Blob([response.data]));
             
-            // Criar um link temporário para simular o download
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', `${currentSong.title}.mp3`); // Defina o nome do arquivo baixado
+            link.setAttribute('download', `${currentSong.title}.mp3`);
             document.body.appendChild(link);
             link.click();
     
-            // Verificar se o link ainda possui um parentNode antes de remover
             if (link.parentNode) {
                 link.parentNode.removeChild(link);
             }
@@ -251,7 +258,11 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong, isAuthenticated 
         } finally {
             setIsDownloading(false);
         }
-    };    
+    };
+
+    function handleArtistClick(artistId: number) {
+        navigate(`/artist/${artistId}`);
+    }
     
     const PlaceholderBox = (
         <Box
@@ -266,7 +277,7 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong, isAuthenticated 
                 backgroundColor: "#ADB5BD",
             }}
         >
-            <Album style={{ width: 40, height: 40, color: "#FBFAFF" }} />
+            <Album style={{ width: 40, height: 40, color: "#ffffff" }} />
         </Box>
     );
 
@@ -275,6 +286,7 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong, isAuthenticated 
         if (audioPlayer) {
             const updateCurrentTime = () => {
                 setCurrentTime(audioPlayer.currentTime);
+                setSliderCurrentTime(audioPlayer.currentTime);
             };
 
             audioPlayer.addEventListener('timeupdate', updateCurrentTime);
@@ -285,19 +297,22 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong, isAuthenticated 
         }
     }, [audioPlayerRef.current]);
 
+    useEffect(() => {
+        setSliderVolume(volume);
+    }, [volume]);
+
     return (
         <Box
             sx={{
-                position: 'fixed',
                 bottom: 0,
                 left: 0,
                 right: 0,
-                backgroundColor: '#F4EFFA',
+                backgroundColor: '#F4EFFD',
                 padding: '10px 20px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                width: "100%"
+                width: "100vw"
             }}
         >
             <audio ref={audioPlayerRef} />
@@ -326,9 +341,11 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong, isAuthenticated 
                             <Box display="flex" alignItems="center">
                                 <Typography variant="subtitle2">{currentSong.title}</Typography>
                             </Box>
-                            <Typography variant="body2" color="textSecondary">
-                                {currentSong.artist.name}
-                            </Typography>
+                            <ButtonBase onClick={(event) => handleArtistClick(currentSong.artist.id)}>
+                                <Typography variant="body2" color="textSecondary">
+                                    {currentSong.artist.name}
+                                </Typography>
+                            </ButtonBase>
                         </Box>
                         <IconButton onClick={handleLikeSong} disabled={isLiking}>
                             {isLiking ? (
@@ -352,12 +369,13 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong, isAuthenticated 
                     {isPlaying ? <PauseCircleFilled fontSize="large" style={{ width: 50, height: 50, color: "#2F184B" }} /> : <PlayCircleFilled fontSize="large" style={{ width: 50, height: 50, color: "#2F184B" }} />}
                 </IconButton>
                 <Box display="flex" alignItems="center" >
-                    <Typography variant="caption">{`${Math.floor(currentTime / 60)}:${(currentTime % 60).toFixed(0).padStart(2, '0')}`}</Typography>
+                    <Typography variant="caption">{`${Math.floor(sliderCurrentTime / 60)}:${(sliderCurrentTime % 60).toFixed(0).padStart(2, '0')}`}</Typography>
                     <Slider
-                        value={currentTime}
+                        value={sliderCurrentTime}
                         min={0}
                         max={duration}
                         onChange={handleSliderChange}
+                        onChangeCommitted={handleSliderChangeCommitted}
                         aria-labelledby="audio-slider"
                         sx={{ 
                             width: 500, 
@@ -387,11 +405,12 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong, isAuthenticated 
                     <VolumeUpIcon style={{ color: "#2F184B" }} />
                 </IconButton>
                 <Slider
-                    value={volume}
+                    value={sliderVolume}
                     min={0}
                     max={1}
                     step={0.01}
                     onChange={handleVolumeChange}
+                    onChangeCommitted={handleVolumeChangeCommitted}
                     aria-labelledby="volume-slider"
                     sx={{ 
                         width: 100, 

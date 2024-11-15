@@ -31,7 +31,7 @@ export default function Menu({searchValue, setSearchValue, fetchSongsFromArtist,
     const open = Boolean(anchorEl);
 
     return (
-        <nav style={{ display: 'flex', justifyContent: 'space-between', backgroundColor: '#FBFAFF', alignItems: 'center', height: '85px', marginLeft: '3rem', marginRight: '3rem'}}>
+        <nav style={{ display: 'flex', justifyContent: 'space-between', backgroundColor: '#ffffff', alignItems: 'center', height: '85px', marginLeft: '3rem', marginRight: '3rem'}}>
             <div style={{ display: 'flex', gap: '1rem', alignItems: 'center'}}>
                 <Link to="/" style={{ textDecoration: 'none', color: '#4B306A' }}>
                     <IconButton style={{paddingLeft: 0}}>

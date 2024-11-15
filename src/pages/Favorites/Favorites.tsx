@@ -14,7 +14,7 @@ export default function Favorites({ isAuthenticated, onSongSelect, playingSongId
     if (isSongsLoading) {
         return (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                <CircularProgress />
+                <CircularProgress style={{color: "#2F184B"}} />
             </div>
         );
     }
@@ -43,7 +43,7 @@ export default function Favorites({ isAuthenticated, onSongSelect, playingSongId
     }
 
     return (
-        <Box padding={"32px"} paddingLeft={"3rem"} paddingRight={"3rem"}>
+        <Box padding={"32px"} paddingLeft={"3rem"} paddingRight={"3rem"} height={"100%"} style={{height: "calc(100vh - 116px)", overflowY: "auto"}}>
             <Box display="flex" flexDirection="row" alignItems="center" marginBottom={2}>
                 <Favorite style={{ marginRight: '8px', width: 40, height: 40, color: '#4B306A' }} />
                 <Typography gutterBottom margin={0}>

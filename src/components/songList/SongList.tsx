@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { Card, CardContent, Typography, CardMedia, CircularProgress, Grid, Box, IconButton, Popover, MenuItem, Button, Tooltip, ButtonBase } from '@mui/material';
+import { Card, CardContent, Typography, Grid, Box, IconButton, Popover, MenuItem, Tooltip, ButtonBase } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseIcon from '@mui/icons-material/Pause';
 import AddIcon from '@mui/icons-material/Add';
 import { SongListProps } from './ISongList';
 import api from '../../services/api';
-import { Album, CalendarMonth, Delete, Favorite, LockClock, PunchClock, QueryBuilder, QueueMusic, SentimentVeryDissatisfied, Subscriptions } from '@mui/icons-material';
+import { CalendarMonth, Delete, Favorite, QueryBuilder } from '@mui/icons-material';
 import { useNavigate, useParams } from 'react-router-dom';
 import SongImage from '../../utils/songImages/SongImage';
 import { NotificationType, useNotification } from '../../utils/notifications/NotificationContext';
+import "./SongList.sass"
 
 export default function SongList({ isAuthenticated, onSongSelect, playingSongId, isPlaying, togglePlayPause, songs, playlists, isPlaylist, fetchSongsFromPlaylist, fetchSongsFromArtist }: SongListProps) {
     const [hoveredSongId, setHoveredSongId] = useState<number | null>(null);
@@ -108,37 +109,47 @@ export default function SongList({ isAuthenticated, onSongSelect, playingSongId,
 
     const formatDate = (isoString: string) => {
         const date = new Date(isoString);
-        return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'medium' }).format(date);
-    };
+        const now = new Date();
+        const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+        
+        const minutes = Math.floor(seconds / 60);
+        const hours = Math.floor(minutes / 60);
+        const days = Math.floor(hours / 24);
+        const weeks = Math.floor(days / 7);
+        const months = Math.floor(days / 30);
+    
+        if (seconds < 60) return `${seconds} segundos atrás`;
+        if (minutes < 60) return `${minutes} minutos atrás`;
+        if (hours < 24) return `${hours} horas atrás`;
+        if (days < 7) return `${days} dias atrás`;
+        if (weeks < 4) return `${weeks} semanas atrás`;
+        return `${months} meses atrás`;
+    };       
 
     function handleArtistClick(artistId: number) {
-        fetchSongsFromArtist(artistId);
         navigate(`/artist/${artistId}`);
     }
 
     return (
-        <Box>
-            <Box>
-                <Grid container spacing={3} justifyContent="left">
-                    {songs.map((song) => (
-                        <Grid item xs={12} sm={6} key={song.id}>
-                            <Card
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    padding: '10px',
-                                    backgroundColor: hoveredSongId === song.id ? '#f0f0f0' : '#FBFAFF',
-                                    transition: 'background-color 0.3s ease'
-                                }}
-                                elevation={0}
-                                onMouseEnter={() => handleMouseEnter(song.id)}
-                                onMouseLeave={handleMouseLeave}
-                            >
-                                <Box
-                                    position="relative"
-                                    style={{ marginRight: '16px' }}
-                                >
-                                    <SongImage song={song} handleImageClick={handleImageClick}/>
+        <Box style={{ overflowY: 'auto' }} className={"song-list-container"}>
+            <Grid container spacing={3} justifyContent="left">
+                {songs.map((song) => (
+                    <Grid item xs={12} key={song.id}>
+                        <Card
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                padding: '10px',
+                                backgroundColor: hoveredSongId === song.id ? '#f0f0f0' : '#ffffff',
+                                transition: 'background-color 0.3s ease',
+                            }}
+                            elevation={0}
+                            onMouseEnter={() => handleMouseEnter(song.id)}
+                            onMouseLeave={handleMouseLeave}
+                        >
+                            <Box display="flex" flex="1.5" alignItems="center" style={{ minWidth: 0 }}>
+                                <Box position="relative" style={{ marginRight: '16px', flexShrink: 0 }}>
+                                    <SongImage song={song} handleImageClick={handleImageClick} />
                                     {hoveredSongId === song.id && (
                                         <IconButton
                                             style={{
@@ -155,51 +166,74 @@ export default function SongList({ isAuthenticated, onSongSelect, playingSongId,
                                         </IconButton>
                                     )}
                                 </Box>
-                                <CardContent style={{ flex: '1 0 auto' }}>
-                                    <Typography variant="subtitle1" component="div">
+                                <CardContent style={{ flex: 3, minWidth: 0 }}>
+                                    <Typography
+                                        variant="subtitle1"
+                                        component="div"
+                                        style={{
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            whiteSpace: 'nowrap',
+                                        }}
+                                    >
                                         {song.title}
                                     </Typography>
                                     <ButtonBase onClick={(event) => handleArtistClick(song.artist.id)}>
-                                        <Typography variant="body2" color="text.secondary">
+                                        <Typography
+                                            variant="body2"
+                                            color="text.secondary"
+                                            style={{
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                whiteSpace: 'nowrap',
+                                            }}
+                                        >
                                             {song.artist.name}
                                         </Typography>
                                     </ButtonBase>
                                 </CardContent>
-                                <Typography variant="body2" color="text.secondary" style={{ marginRight: "3rem" }} display={"flex"} alignItems={"center"}>
-                                    <Favorite style={{ paddingRight: "0.5rem" }} />
+                            </Box>
+                            <Box style={{ flex: 0.5, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                                <Favorite style={{ paddingRight: '0.5rem' }} />
+                                <Typography variant="body2" color="text.secondary">
                                     {song.likes}
                                 </Typography>
-                                <Typography variant="body2" color="text.secondary" style={{ marginRight: "3rem" }} display={"flex"} alignItems={"center"}>
-                                    <CalendarMonth style={{ paddingRight: "0.5rem" }} />
+                            </Box>
+                            <Box style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                                <CalendarMonth style={{ paddingRight: '0.5rem' }} />
+                                <Typography variant="body2" color="text.secondary">
                                     {formatDate(song.creationDate)}
                                 </Typography>
-                                <Typography variant="body2" color="text.secondary" style={{ marginRight: '10px' }} display={"flex"} alignItems={"center"}>
-                                    <QueryBuilder style={{ paddingRight: "0.5rem" }} />
+                            </Box>
+                            <Box style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                                <QueryBuilder style={{ paddingRight: '0.5rem' }} />
+                                <Typography variant="body2" color="text.secondary">
                                     {formatDuration(song.length)}
                                 </Typography>
-                                {isAuthenticated && (
-                                    <Box style={{ marginLeft: 'auto', paddingRight: '10px', display: 'flex', alignItems: 'center', flexDirection: "column" }}>
-                                        {isPlaylist ? (
-                                            <Tooltip title="Remover desta playlist">
-                                                <IconButton onClick={(event) => handleRemoveFromPlaylist(event, song.id)}>
-                                                    <Delete />
-                                                </IconButton>
-                                            </Tooltip>
-                                        ) : ( 
-                                            <Tooltip title="Adicionar a uma playlist">
-                                                <IconButton onClick={(event) => handleAddButtonClick(event, song.id)}>
-                                                    <AddIcon />
-                                                </IconButton>
-                                            </Tooltip>
-                                        )}
-                                    </Box>
-                                )}
-                            </Card>
-                        </Grid>
-                    ))}
-                </Grid>
-            </Box>
+                            </Box>
+                            {isAuthenticated && (
+                                <Box style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                                    {isPlaylist ? (
+                                        <Tooltip title="Remover desta playlist">
+                                            <IconButton onClick={(event) => handleRemoveFromPlaylist(event, song.id)}>
+                                                <Delete />
+                                            </IconButton>
+                                        </Tooltip>
+                                    ) : (
+                                        <Tooltip title="Adicionar a uma playlist">
+                                            <IconButton onClick={(event) => handleAddButtonClick(event, song.id)}>
+                                                <AddIcon />
+                                            </IconButton>
+                                        </Tooltip>
+                                    )}
+                                </Box>
+                            )}
+                        </Card>
+                    </Grid>
+                ))}
+            </Grid>
 
+    
             <Popover
                 open={Boolean(anchorEl)}
                 anchorEl={anchorEl}
@@ -220,7 +254,7 @@ export default function SongList({ isAuthenticated, onSongSelect, playingSongId,
                 ))}
             </Popover>
         </Box>
-    );
+    );    
 }
 
 function formatDuration(seconds: number): string {

@@ -125,7 +125,7 @@ export default function UploadFile({ fetchSongsFromArtist }: IUploadFileProps) {
     };
 
     return (
-        <Box display="flex" justifyContent="center" mt={4}>
+        <Box display="flex" justifyContent="center" mt={4} style={{height: "calc(100vh - 116px)", overflowY: "auto"}}>
             <Box display="flex" maxWidth="800px" width="100%" gap={4}>
                 <Box
                     display="flex"

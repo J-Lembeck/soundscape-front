@@ -105,20 +105,21 @@ export default function Sidebar({ playlists, setPlaylists, onPlaylistSelect, isA
 
     if (isPlaylistsLoading) {
         return (
-            <Box sx={{ width: '320px', backgroundColor: '#F4EFFA', padding: '16px', paddingTop: 0}}>
+            <Box sx={{ width: '320px', backgroundColor: '#F4EFFD', padding: '16px', paddingTop: 0}}>
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                    <CircularProgress />
+                    <CircularProgress style={{color: "#2F184B"}} />
                 </div>
             </Box>
         );
     }
 
     return (
-        <Box sx={{ width: '320px', backgroundColor: '#F4EFFA', padding: '16px', paddingTop: 0}}>
+        <Box sx={{ width: '320px', backgroundColor: '#F4EFFD', padding: '16px', paddingTop: 0, borderRadius: "6px", margin: "8px"}}
+        >
             {isAuthenticated && (
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 , height: "85px"}}>
                         <InputBase
-                            style={{backgroundColor: "#FBFAFF"}}
+                            style={{backgroundColor: "#ffffff"}}
                             placeholder="Pesquise..."
                             value={searchQuery} 
                             onChange={(e) => setSearchQuery(e.target.value)}
@@ -145,7 +146,7 @@ export default function Sidebar({ playlists, setPlaylists, onPlaylistSelect, isA
                     {filteredPlaylists.map(playlist => (
                         <ListItem key={playlist.id} button onClick={() => handlePlaylistClick(playlist.id)}>
                             <ListItemIcon style={{ display: "flex", justifyContent: "center", alignItems: "center", width: 70, height: 70, borderRadius: 4, marginRight: 16, backgroundColor: "#ADB5BD" }}>
-                                <LibraryMusic style={{ width: 40, height: 40, color: "#FBFAFF" }}/>
+                                <LibraryMusic style={{ width: 40, height: 40, color: "#ffffff" }}/>
                             </ListItemIcon>
                             <ListItemText primary={playlist.name} />
                             <Tooltip title="Excluir playlist">
