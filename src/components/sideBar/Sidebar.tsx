@@ -1,11 +1,11 @@
-import { Add, Delete, LibraryMusic, Person, Search, SentimentVerySatisfied } from "@mui/icons-material";
-import { Box, Button, CircularProgress, IconButton, InputAdornment, InputBase, List, ListItem, ListItemIcon, ListItemText, Popover, Tab, Tabs, Tooltip, Typography } from "@mui/material";
+import { Add, LibraryMusic, Person, Search } from "@mui/icons-material";
+import { Box, Button, CircularProgress, IconButton, InputBase, List, ListItem, ListItemIcon, ListItemText, Popover, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { ArtistDTO } from "../../pages/artists/IArtist";
 import api from "../../services/api";
 import { NotificationType, useNotification } from "../../utils/notifications/NotificationContext";
 import { PlaylistDetails, SidebarProps } from "./ISidebar";
-import { useNavigate } from "react-router-dom";
 
 export default function Sidebar({ playlists, setPlaylists, onPlaylistSelect, isAuthenticated, isPlaylistsLoading, setIsPlaylistsLoading }: SidebarProps) {
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -173,16 +173,28 @@ export default function Sidebar({ playlists, setPlaylists, onPlaylistSelect, isA
                     justifyContent: 'center',
                     alignItems: 'center',
                     padding: '16px 0',
-                    fontSize: '42px',
                     fontWeight: '600',
                     fontFamily: 'Outfit, sans-serif !important',
                 }}
             >
-                <span style={{ color: '#452C63' }}>SoundScape</span>
+                <Typography
+                    variant="h4"
+                    sx={{
+                        fontWeight: 'bold',
+                        fontFamily: '"Outfit", sans-serif',
+                        color: '#452C63',
+                        fontSize: '36px',
+                    }}
+                >
+                    Sound
+                    <span style={{ color: '#FFFFFF', backgroundColor: '#452C63', padding: '0 4px', borderRadius: '4px' }}>
+                        Scape
+                    </span>
+                </Typography>
             </Box>
 
             {isAuthenticated && (
-                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mt: 2 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mt: 2, marginTop: "8px" }}>
                     <Button
                         variant={selectedTab === 'playlists' ? 'contained' : 'outlined'}
                         onClick={() => setSelectedTab('playlists')}

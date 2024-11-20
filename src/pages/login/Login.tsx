@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Box, Button, TextField, Typography, Container, Alert, InputAdornment, IconButton } from '@mui/material';
+import { Box, Button, TextField, Typography, Container, Alert, InputAdornment, IconButton, Paper } from '@mui/material';
 import api from '../../services/api';
 import { useNavigate } from 'react-router-dom';
 import { NotificationType, useNotification } from '../../utils/notifications/NotificationContext';
 import { ILoginProps } from './ILogin';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 
-export default function Login({setIsAuthenticated}: ILoginProps) {
+export default function Login({ setIsAuthenticated }: ILoginProps) {
     const [username, setUsername] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [error, setError] = useState<string | null>(null);
@@ -48,74 +48,117 @@ export default function Login({setIsAuthenticated}: ILoginProps) {
                 borderColor: 'gray',
             },
             '&.Mui-focused fieldset': {
-                borderColor: '#4B306A',
+                borderColor: '#452C63',
             },
         },
         '& .MuiInputLabel-root': {
             color: 'gray',
         },
         '& .MuiInputLabel-root.Mui-focused': {
-            color: '#4B306A',
+            color: '#452C63',
         }
-    }
+    };
 
     return (
         <Container maxWidth="xs">
-            <Box display="flex" flexDirection="column" alignItems="center" mt={8}>
-                <Typography variant="h5" mb={2}>
-                    Soundscape
-                </Typography>
-                {error && <Alert severity="error">{error}</Alert>}
-                <TextField
-                    label="Nome de Usuário"
-                    variant="outlined"
-                    fullWidth
-                    margin="normal"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    sx={inputStyle}
-                />
-                <TextField
-                    label="Senha"
-                    type={showPassword ? 'text' : 'password'}
-                    variant="outlined"
-                    fullWidth
-                    margin="normal"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    sx={inputStyle}
-                    InputProps={{
-                        endAdornment: (
-                            <InputAdornment position="end">
-                                <IconButton
-                                    onClick={handleClickShowPassword}
-                                    edge="end"
-                                >
-                                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                                </IconButton>
-                            </InputAdornment>
-                        ),
-                    }}
-                />
-                <Button
-                    variant="contained"
-                    style={{backgroundColor: "#4B306A"}}
-                    fullWidth
-                    onClick={handleLogin}
-                    sx={{ mt: 2 }}
-                >
-                    Entrar
-                </Button>
-                <Button
-                    variant="text"
-                    style={{color: "#4B306A"}}
-                    fullWidth
-                    onClick={() => navigate('/register')}
-                    sx={{ mt: 2 }}
-                >
-                    Cadastrar-se
-                </Button>
-            </Box>
+            <Paper
+                elevation={3}
+                sx={{
+                    padding: 4,
+                    borderRadius: 3,
+                    backgroundColor: '#F4EFFD',
+                }}
+            >
+                <Box display="flex" flexDirection="column" alignItems="center" mt={2}>
+                    {/* Logo / Título */}
+                    <Typography
+                        variant="h4"
+                        sx={{
+                            fontWeight: 'bold',
+                            fontFamily: '"Outfit", sans-serif',
+                            color: '#452C63',
+                            marginBottom: 2,
+                        }}
+                    >
+                        Sound
+                        <span style={{ color: '#FFFFFF', backgroundColor: '#452C63', padding: '0 4px', borderRadius: '4px' }}>
+                            Scape
+                        </span>
+                    </Typography>
+
+                    {/* Erro */}
+                    {error && <Alert severity="error" sx={{ width: '100%', mb: 2 }}>{error}</Alert>}
+
+                    {/* Campo Nome de Usuário */}
+                    <TextField
+                        label="Nome de Usuário"
+                        variant="outlined"
+                        fullWidth
+                        margin="normal"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        sx={inputStyle}
+                    />
+
+                    {/* Campo Senha */}
+                    <TextField
+                        label="Senha"
+                        type={showPassword ? 'text' : 'password'}
+                        variant="outlined"
+                        fullWidth
+                        margin="normal"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        sx={inputStyle}
+                        InputProps={{
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        onClick={handleClickShowPassword}
+                                        edge="end"
+                                    >
+                                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                                    </IconButton>
+                                </InputAdornment>
+                            ),
+                        }}
+                    />
+
+                    {/* Botão Entrar */}
+                    <Button
+                        variant="contained"
+                        fullWidth
+                        onClick={handleLogin}
+                        sx={{
+                            mt: 2,
+                            backgroundColor: '#452C63',
+                            color: '#fff',
+                            fontWeight: 'bold',
+                            textTransform: 'none',
+                            '&:hover': {
+                                backgroundColor: '#6A41A1',
+                            },
+                        }}
+                    >
+                        Entrar
+                    </Button>
+
+                    {/* Botão Cadastrar-se */}
+                    <Button
+                        variant="text"
+                        fullWidth
+                        onClick={() => navigate('/register')}
+                        sx={{
+                            mt: 2,
+                            color: '#452C63',
+                            fontWeight: 'bold',
+                            textTransform: 'none',
+                        }}
+                    >
+                        Cadastrar-se
+                    </Button>
+                </Box>
+            </Paper>
         </Container>
     );
 };
