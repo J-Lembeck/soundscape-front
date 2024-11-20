@@ -227,7 +227,7 @@ export default function Sidebar({
                         variant={selectedTab === 'playlists' ? 'contained' : 'outlined'}
                         onClick={() => setSelectedTab('playlists')}
                         sx={{
-                            borderRadius: '50px',
+                            borderRadius: '10px',
                             textTransform: 'none',
                             padding: '8px 24px',
                             fontSize: '14px',
@@ -247,7 +247,7 @@ export default function Sidebar({
                         variant={selectedTab === 'artists' ? 'contained' : 'outlined'}
                         onClick={() => setSelectedTab('artists')}
                         sx={{
-                            borderRadius: '50px',
+                            borderRadius: '10px',
                             textTransform: 'none',
                             padding: '8px 24px',
                             fontSize: '14px',

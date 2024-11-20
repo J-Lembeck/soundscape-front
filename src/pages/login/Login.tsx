@@ -175,6 +175,7 @@ export default function Login({ setIsAuthenticated }: ILoginProps) {
                             margin="normal"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
+                            placeholder='Digite seu usuário...'
                             sx={errors.username ? errorInputStyle : inputStyle}
                             style={{ marginTop: 0 }}
                             variant="outlined"
@@ -197,6 +198,7 @@ export default function Login({ setIsAuthenticated }: ILoginProps) {
                             sx={errors.password ? errorInputStyle : inputStyle}
                             style={{ marginTop: 0 }}
                             variant="outlined"
+                            placeholder='Digite sua senha...'
                             InputProps={{
                                 endAdornment: (
                                     <InputAdornment position="end">
@@ -251,6 +253,7 @@ export default function Login({ setIsAuthenticated }: ILoginProps) {
                             fontWeight: 'bold',
                             textTransform: 'none',
                         }}
+                        style={{ marginTop: 0 }}
                     >
                         Cadastrar-se
                     </Button>

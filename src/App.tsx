@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Route, Routes, useLocation, useNavigate } from
 import Login from './pages/login/Login';
 import Menu from "./components/menu/Menu";
 import Player from "./components/player/Player";
-import UploadFile from './components/uploadFile/UploadFile';
+import UploadFile from './components/uploadFile/UploadFileModal';
 import Sidebar from './components/sideBar/Sidebar';
 import ProtectedRoute from './components/protectedRoute/ProtectedRoute';
 import SongList from './components/songList/SongList';
@@ -358,14 +358,6 @@ function App() {
                                             fetchLikedSongs={fetchLikedSongs}
                                             isSongsLoading={isSongsLoading}
                                         />
-                                    </ProtectedRoute>
-                                }
-                            />
-                            <Route
-                                path="/upload"
-                                element={
-                                    <ProtectedRoute>
-                                        <UploadFile fetchSongsFromArtist={fetchSongsFromArtist}/>
                                     </ProtectedRoute>
                                 }
                             />

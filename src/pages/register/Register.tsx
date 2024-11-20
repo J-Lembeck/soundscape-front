@@ -246,7 +246,6 @@ export default function Register() {
                         </Typography>
                     </Box>
 
-                    {/* Nome de Usuário */}
                     <Box width="100%">
                         <Typography
                             component="label"
@@ -261,6 +260,7 @@ export default function Register() {
                             sx={errors.name ? errorInputStyle : inputStyle}
                             style={{ marginTop: 0 }}
                             variant="outlined"
+                            placeholder='Digite um nome de usuário...'
                         />
                         {errors.name && (
                             <Box display="flex" alignItems="center" sx={{ color: '#D32F2F', mt: 0.5 }}>
@@ -270,7 +270,6 @@ export default function Register() {
                         )}
                     </Box>
 
-                    {/* Email */}
                     <Box width="100%">
                         <Typography
                             component="label"
@@ -286,6 +285,7 @@ export default function Register() {
                             sx={errors.email ? errorInputStyle : inputStyle}
                             style={{ marginTop: 0 }}
                             variant="outlined"
+                            placeholder='Digite seu email...'
                         />
                         {errors.email && (
                             <Box display="flex" alignItems="center" sx={{ color: '#D32F2F', mt: 0.5 }}>
@@ -295,7 +295,6 @@ export default function Register() {
                         )}
                     </Box>
 
-                    {/* Senha */}
                     <Box width="100%">
                         <Typography
                             component="label"
@@ -327,6 +326,7 @@ export default function Register() {
                             }
                             style={{ marginTop: 0 }}
                             variant="outlined"
+                            placeholder='Crie uma senha...'
                             InputProps={{
                                 endAdornment: (
                                     <InputAdornment position="end">
@@ -357,7 +357,6 @@ export default function Register() {
                         )}
                     </Box>
 
-                    {/* Confirmar Senha */}
                     <Box width="100%">
                         <Typography
                             component="label"
@@ -389,6 +388,7 @@ export default function Register() {
                             }
                             style={{ marginTop: 0 }}
                             variant="outlined"
+                            placeholder='Confirme sua senha...'
                             InputProps={{
                                 endAdornment: (
                                     <InputAdornment position="end">
