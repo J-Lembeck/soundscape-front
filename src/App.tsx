@@ -125,7 +125,6 @@ function App() {
             setIsPlaylistsLoading(false);
             return;
         }
-        
 
         const fetchPlaylists = async () => {
             try {
@@ -274,6 +273,7 @@ function App() {
                         onPlaylistSelect={handlePlaylistSelect}
                         isAuthenticated={isAuthenticated}
                         isPlaylistsLoading={isPlaylistsLoading}
+                        setIsPlaylistsLoading={setIsPlaylistsLoading}
                     />
                 )}
         

@@ -14,7 +14,6 @@ export default function Sidebar({ playlists, setPlaylists, onPlaylistSelect, isA
     const [selectedTab, setSelectedTab] = useState<'playlists' | 'artists'>('playlists');
     const [followedArtists, setFollowedArtists] = useState<ArtistDTO[]>([]);
     const [isArtistsLoading, setIsArtistsLoading] = useState<boolean>(false);
-    const [isSearchVisible, setIsSearchVisible] = useState<boolean>(false);
 
     const navigate = useNavigate();
     const { showNotification } = useNotification();
@@ -237,37 +236,31 @@ export default function Sidebar({ playlists, setPlaylists, onPlaylistSelect, isA
                     marginBottom: 0
                 }}
             >
-                {!isSearchVisible ? (
-                    <IconButton onClick={() => setIsSearchVisible(true)} sx={{ color: '#2F184B', height: '40px', width: '40px' }}>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        backgroundColor: '#ffffff',
+                        borderRadius: '10px',
+                        height: '40px',
+                        flex: 1,
+                    }}
+                >
+                    <IconButton sx={{ color: '#2F184B' }}>
                         <Search />
                     </IconButton>
-                ) : (
-                    <Box
+                    <InputBase
+                        placeholder={selectedTab === 'playlists' ? 'Pesquise playlists...' : 'Pesquise artistas...'}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        fullWidth
                         sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            backgroundColor: '#ffffff',
-                            borderRadius: '10px',
-                            height: '40px',
-                            flex: 1,
+                            ml: 1,
+                            fontSize: '14px',
+                            height: '100%',
                         }}
-                    >
-                        <IconButton onClick={() => setIsSearchVisible(false)} sx={{ color: '#2F184B' }}>
-                            <Search />
-                        </IconButton>
-                        <InputBase
-                            placeholder={selectedTab === 'playlists' ? 'Pesquise playlists...' : 'Pesquise artistas...'}
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            fullWidth
-                            sx={{
-                                ml: 1,
-                                fontSize: '14px',
-                                height: '100%',
-                            }}
-                        />
-                    </Box>
-                )}
+                    />
+                </Box>
                 {selectedTab === 'playlists' && (
                     <IconButton onClick={handlePopoverOpen} sx={{ color: '#2F184B', height: '40px', width: '40px' }}>
                         <Add />
@@ -366,17 +359,54 @@ export default function Sidebar({ playlists, setPlaylists, onPlaylistSelect, isA
                     }}
                     transformOrigin={{
                         vertical: 'top',
-                        horizontal: 'center',
+                        horizontal: 'left',
+                    }}
+                    PaperProps={{
+                        sx: {
+                            borderRadius: '12px',
+                            backgroundColor: '#F4EFFD',
+                            boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
+                            padding: '16px',
+                            width: '300px',
+                        },
                     }}
                 >
-                    <Box sx={{ p: 2 }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        <Typography
+                            variant="h6"
+                            sx={{
+                                color: '#2F184B',
+                                fontWeight: 'bold',
+                                textAlign: 'center',
+                            }}
+                        >
+                            Nova Playlist
+                        </Typography>
                         <InputBase
-                            placeholder="Nome da nova playlist"
+                            placeholder="Digite o nome da playlist"
                             value={newPlaylistName}
                             onChange={(e) => setNewPlaylistName(e.target.value)}
                             fullWidth
+                            sx={{
+                                backgroundColor: '#fff',
+                                borderRadius: '6px',
+                                padding: '8px 12px',
+                                fontSize: '14px',
+                            }}
                         />
-                        <Button variant="contained" onClick={handleCreatePlaylist}>
+                        <Button
+                            variant="contained"
+                            onClick={handleCreatePlaylist}
+                            sx={{
+                                backgroundColor: '#2F184B',
+                                textTransform: 'none',
+                                fontWeight: 'bold',
+                                borderRadius: '6px',
+                                '&:hover': {
+                                    backgroundColor: '#452C63',
+                                },
+                            }}
+                        >
                             Criar
                         </Button>
                     </Box>
