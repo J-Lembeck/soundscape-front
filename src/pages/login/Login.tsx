@@ -1,16 +1,26 @@
 import React, { useState } from 'react';
-import { Box, Button, TextField, Typography, Container, Alert, InputAdornment, IconButton, Paper } from '@mui/material';
+import {
+    Box,
+    Button,
+    TextField,
+    Typography,
+    Container,
+    Alert,
+    InputAdornment,
+    IconButton,
+    Paper,
+} from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import api from '../../services/api';
 import { useNavigate } from 'react-router-dom';
 import { NotificationType, useNotification } from '../../utils/notifications/NotificationContext';
 import { ILoginProps } from './ILogin';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 export default function Login({ setIsAuthenticated }: ILoginProps) {
     const [username, setUsername] = useState<string>('');
     const [password, setPassword] = useState<string>('');
-    const [error, setError] = useState<string | null>(null);
     const [showPassword, setShowPassword] = useState<boolean>(false);
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const navigate = useNavigate();
     const { showNotification } = useNotification();
 
@@ -19,131 +29,218 @@ export default function Login({ setIsAuthenticated }: ILoginProps) {
     };
 
     const handleLogin = async () => {
+        const validationErrors = validateFields();
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+
         try {
             const response = await api.post('/auth/login', { username, password });
             localStorage.setItem('token', response.data.token);
             localStorage.setItem('username', response.data.username);
             setIsAuthenticated(true);
 
-            setError(null);
             navigate('/');
-        } catch (error) {
-            if (error instanceof Error) {
-                showNotification({
-                    type: NotificationType.ERROR,
-                    content: 'Usuário ou senha incorretos.',
-                });
-            } else {
-                showNotification({
-                    type: NotificationType.ERROR,
-                    content: 'Falha ao entrar: Ocorreu um erro desconhecido.',
-                });
-            }
+        } catch (error: any) {
+            showNotification({
+                type: NotificationType.ERROR,
+                content: 'Usuário ou senha incorretos.',
+            });
         }
+    };
+
+    const validateFields = () => {
+        const errors: { [key: string]: string } = {};
+
+        if (!username) {
+            errors.username = 'O nome de usuário é obrigatório.';
+        }
+
+        if (!password) {
+            errors.password = 'A senha é obrigatória.';
+        }
+
+        return errors;
     };
 
     const inputStyle = {
         '& .MuiOutlinedInput-root': {
+            backgroundColor: '#FFFFFF',
+            borderRadius: '6px',
+            marginTop: '4px',
             '& fieldset': {
-                borderColor: 'gray',
-            },
-            '&.Mui-focused fieldset': {
-                borderColor: '#452C63',
+                border: 'none',
             },
         },
-        '& .MuiInputLabel-root': {
-            color: 'gray',
+    };
+
+    const errorInputStyle = {
+        '& .MuiOutlinedInput-root': {
+            backgroundColor: '#FFEBEB',
+            borderRadius: '6px',
+            marginTop: '4px',
+            '& fieldset': {
+                border: 'none',
+            },
         },
-        '& .MuiInputLabel-root.Mui-focused': {
-            color: '#452C63',
-        }
+    };
+
+    const labelStyle = {
+        color: '#6A41A1',
+        fontSize: '16px',
+        fontWeight: 400,
+        marginBottom: '4px',
+    };
+
+    const errorLabelStyle = {
+        color: '#D32F2F',
+        fontSize: '16px',
+        fontWeight: 400,
+        marginBottom: '4px',
     };
 
     return (
-        <Container maxWidth="xs">
+        <Container
+            maxWidth={false}
+            sx={{
+                minHeight: '100vh',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                background:
+                    'linear-gradient(45deg, rgba(2,0,36,1) 0%, rgba(69,44,99,1) 50%, rgba(106,65,161,1) 100%)',
+                padding: 2,
+            }}
+        >
             <Paper
                 elevation={3}
                 sx={{
+                    width: '100%',
+                    maxWidth: '400px',
                     padding: 4,
                     borderRadius: 3,
                     backgroundColor: '#F4EFFD',
                 }}
             >
-                <Box display="flex" flexDirection="column" alignItems="center" mt={2}>
-                    {/* Logo / Título */}
-                    <Typography
-                        variant="h4"
+                <Box
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="center"
+                    sx={{ gap: 2, width: '100%' }}
+                >
+                    <Box
                         sx={{
-                            fontWeight: 'bold',
-                            fontFamily: '"Outfit", sans-serif',
-                            color: '#452C63',
-                            marginBottom: 2,
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            padding: '24px 0',
+                            fontWeight: '600',
+                            fontFamily: 'Outfit, sans-serif !important',
                         }}
                     >
-                        Sound
-                        <span style={{ color: '#FFFFFF', backgroundColor: '#452C63', padding: '0 4px', borderRadius: '4px' }}>
-                            Scape
-                        </span>
-                    </Typography>
+                        <Typography
+                            variant="h4"
+                            sx={{
+                                fontWeight: 'bold',
+                                fontFamily: '"Outfit", sans-serif',
+                                color: '#452C63',
+                                fontSize: '36px',
+                            }}
+                        >
+                            Sound
+                            <span style={{ color: '#FFFFFF', backgroundColor: '#452C63', padding: '0 4px 6px', borderRadius: '4px' }}>
+                                Scape
+                            </span>
+                        </Typography>
+                    </Box>
 
-                    {/* Erro */}
-                    {error && <Alert severity="error" sx={{ width: '100%', mb: 2 }}>{error}</Alert>}
+                    {Object.keys(errors).length > 0 && (
+                        <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
+                            {Object.values(errors).map((err, index) => (
+                                <div key={index}>{err}</div>
+                            ))}
+                        </Alert>
+                    )}
 
-                    {/* Campo Nome de Usuário */}
-                    <TextField
-                        label="Nome de Usuário"
-                        variant="outlined"
-                        fullWidth
-                        margin="normal"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        sx={inputStyle}
-                    />
+                    <Box width="100%">
+                        <Typography
+                            component="label"
+                            sx={errors.username ? errorLabelStyle : labelStyle}
+                        >
+                            Nome de Usuário
+                        </Typography>
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            sx={errors.username ? errorInputStyle : inputStyle}
+                            style={{ marginTop: 0 }}
+                            variant="outlined"
+                        />
+                    </Box>
 
-                    {/* Campo Senha */}
-                    <TextField
-                        label="Senha"
-                        type={showPassword ? 'text' : 'password'}
-                        variant="outlined"
-                        fullWidth
-                        margin="normal"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        sx={inputStyle}
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <IconButton
-                                        onClick={handleClickShowPassword}
-                                        edge="end"
-                                    >
-                                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                                    </IconButton>
-                                </InputAdornment>
-                            ),
-                        }}
-                    />
+                    <Box width="100%">
+                        <Typography
+                            component="label"
+                            sx={errors.password ? errorLabelStyle : labelStyle}
+                        >
+                            Senha
+                        </Typography>
+                        <TextField
+                            type={showPassword ? 'text' : 'password'}
+                            fullWidth
+                            margin="normal"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            sx={errors.password ? errorInputStyle : inputStyle}
+                            style={{ marginTop: 0 }}
+                            variant="outlined"
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position="end">
+                                        <IconButton
+                                            onClick={handleClickShowPassword}
+                                            edge="end"
+                                            sx={{
+                                                color: '#452C63',
+                                                '&:hover': {
+                                                    color: '#6A41A1',
+                                                },
+                                            }}
+                                        >
+                                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                                        </IconButton>
+                                    </InputAdornment>
+                                ),
+                            }}
+                        />
+                    </Box>
 
-                    {/* Botão Entrar */}
                     <Button
                         variant="contained"
                         fullWidth
                         onClick={handleLogin}
+                        disabled={!username || !password}
                         sx={{
                             mt: 2,
                             backgroundColor: '#452C63',
                             color: '#fff',
                             fontWeight: 'bold',
                             textTransform: 'none',
+                            borderRadius: '6px',
                             '&:hover': {
                                 backgroundColor: '#6A41A1',
+                            },
+                            '&.Mui-disabled': {
+                                backgroundColor: '#CCC',
                             },
                         }}
                     >
                         Entrar
                     </Button>
 
-                    {/* Botão Cadastrar-se */}
                     <Button
                         variant="text"
                         fullWidth
@@ -161,4 +258,4 @@ export default function Login({ setIsAuthenticated }: ILoginProps) {
             </Paper>
         </Container>
     );
-};
+}

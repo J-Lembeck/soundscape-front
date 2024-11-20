@@ -1,5 +1,17 @@
-import { Add, LibraryMusic, Person, Search } from "@mui/icons-material";
-import { Box, Button, CircularProgress, IconButton, InputBase, List, ListItem, ListItemIcon, ListItemText, Popover, Typography } from "@mui/material";
+import { Add, LibraryMusic, Person, Search, Delete } from "@mui/icons-material";
+import {
+    Box,
+    Button,
+    CircularProgress,
+    IconButton,
+    InputBase,
+    List,
+    ListItem,
+    ListItemIcon,
+    ListItemText,
+    Popover,
+    Typography,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArtistDTO } from "../../pages/artists/IArtist";
@@ -7,7 +19,14 @@ import api from "../../services/api";
 import { NotificationType, useNotification } from "../../utils/notifications/NotificationContext";
 import { PlaylistDetails, SidebarProps } from "./ISidebar";
 
-export default function Sidebar({ playlists, setPlaylists, onPlaylistSelect, isAuthenticated, isPlaylistsLoading, setIsPlaylistsLoading }: SidebarProps) {
+export default function Sidebar({
+    playlists,
+    setPlaylists,
+    onPlaylistSelect,
+    isAuthenticated,
+    isPlaylistsLoading,
+    setIsPlaylistsLoading,
+}: SidebarProps) {
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [newPlaylistName, setNewPlaylistName] = useState<string>("");
@@ -119,24 +138,26 @@ export default function Sidebar({ playlists, setPlaylists, onPlaylistSelect, isA
 
     const searchWords = searchQuery.toLowerCase().split(" ").filter(word => word);
 
-    const filteredPlaylists = selectedTab === 'playlists' && searchQuery.trim() !== ""
-        ? playlists.filter(playlist =>
-            searchWords.some(word => playlist.name.toLowerCase().includes(word))
-        )
-        : playlists;
+    const filteredPlaylists =
+        selectedTab === 'playlists' && searchQuery.trim() !== ""
+            ? playlists.filter(playlist =>
+                  searchWords.some(word => playlist.name.toLowerCase().includes(word))
+              )
+            : playlists;
 
-    const filteredArtists = selectedTab === 'artists' && searchQuery.trim() !== ""
-        ? followedArtists.filter(artist =>
-            searchWords.some(word => artist.name.toLowerCase().includes(word))
-        )
-        : followedArtists;
+    const filteredArtists =
+        selectedTab === 'artists' && searchQuery.trim() !== ""
+            ? followedArtists.filter(artist =>
+                  searchWords.some(word => artist.name.toLowerCase().includes(word))
+              )
+            : followedArtists;
 
     async function handleDeletePlaylist(playlistId: number) {
         try {
             await api.delete(`/playlist/deletePlaylist?playlistId=${playlistId}`);
             showNotification({
                 type: NotificationType.SUCCESS,
-                content: 'Playlist excluida com sucesso.',
+                content: 'Playlist excluída com sucesso.',
             });
             fetchPlaylists();
         } catch (error) {
@@ -172,7 +193,7 @@ export default function Sidebar({ playlists, setPlaylists, onPlaylistSelect, isA
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    padding: '16px 0',
+                    padding: '24px 0',
                     fontWeight: '600',
                     fontFamily: 'Outfit, sans-serif !important',
                 }}
@@ -187,14 +208,21 @@ export default function Sidebar({ playlists, setPlaylists, onPlaylistSelect, isA
                     }}
                 >
                     Sound
-                    <span style={{ color: '#FFFFFF', backgroundColor: '#452C63', padding: '0 4px', borderRadius: '4px' }}>
+                    <span
+                        style={{
+                            color: '#FFFFFF',
+                            backgroundColor: '#452C63',
+                            padding: '0 4px 6px',
+                            borderRadius: '4px',
+                        }}
+                    >
                         Scape
                     </span>
                 </Typography>
             </Box>
 
             {isAuthenticated && (
-                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mt: 2, marginTop: "8px" }}>
+                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1, mt: 2, marginTop: '8px' }}>
                     <Button
                         variant={selectedTab === 'playlists' ? 'contained' : 'outlined'}
                         onClick={() => setSelectedTab('playlists')}
@@ -204,11 +232,11 @@ export default function Sidebar({ playlists, setPlaylists, onPlaylistSelect, isA
                             padding: '8px 24px',
                             fontSize: '14px',
                             fontWeight: selectedTab === 'playlists' ? 'bold' : 'normal',
-                            backgroundColor: selectedTab === 'playlists' ? '#2F184B' : 'transparent',
+                            backgroundColor: selectedTab === 'playlists' ? '#452C63' : 'transparent',
                             color: selectedTab === 'playlists' ? '#fff' : '#2F184B',
                             borderColor: '#2F184B',
                             '&:hover': {
-                                backgroundColor: selectedTab === 'playlists' ? '#452C63' : 'rgba(47, 24, 75, 0.1)',
+                                backgroundColor: selectedTab === 'playlists' ? '#2F184B' : 'rgba(47, 24, 75, 0.1)',
                                 borderColor: '#2F184B',
                             },
                         }}
@@ -224,11 +252,11 @@ export default function Sidebar({ playlists, setPlaylists, onPlaylistSelect, isA
                             padding: '8px 24px',
                             fontSize: '14px',
                             fontWeight: selectedTab === 'artists' ? 'bold' : 'normal',
-                            backgroundColor: selectedTab === 'artists' ? '#2F184B' : 'transparent',
+                            backgroundColor: selectedTab === 'artists' ? '#452C63' : 'transparent',
                             color: selectedTab === 'artists' ? '#fff' : '#2F184B',
                             borderColor: '#2F184B',
                             '&:hover': {
-                                backgroundColor: selectedTab === 'artists' ? '#452C63' : 'rgba(47, 24, 75, 0.1)',
+                                backgroundColor: selectedTab === 'artists' ? '#2F184B' : 'rgba(47, 24, 75, 0.1)',
                                 borderColor: '#2F184B',
                             },
                         }}
@@ -245,7 +273,7 @@ export default function Sidebar({ playlists, setPlaylists, onPlaylistSelect, isA
                     justifyContent: 'space-between',
                     mt: 2,
                     mb: 2,
-                    marginBottom: 0
+                    marginBottom: 0,
                 }}
             >
                 <Box
@@ -256,6 +284,7 @@ export default function Sidebar({ playlists, setPlaylists, onPlaylistSelect, isA
                         borderRadius: '10px',
                         height: '40px',
                         flex: 1,
+                        marginBottom: '16px',
                     }}
                 >
                     <IconButton sx={{ color: '#2F184B' }}>
@@ -280,8 +309,8 @@ export default function Sidebar({ playlists, setPlaylists, onPlaylistSelect, isA
                 )}
             </Box>
 
-            {isAuthenticated && (
-                selectedTab === 'playlists' ? (
+            {isAuthenticated &&
+                (selectedTab === 'playlists' ? (
                     isPlaylistsLoading ? (
                         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
                             <CircularProgress style={{ color: '#2F184B' }} />
@@ -299,6 +328,18 @@ export default function Sidebar({ playlists, setPlaylists, onPlaylistSelect, isA
                                         },
                                         cursor: 'pointer',
                                     }}
+                                    secondaryAction={
+                                        <IconButton
+                                            edge="end"
+                                            onClick={(event) => {
+                                                event.stopPropagation();
+                                                handleDeletePlaylist(playlist.id);
+                                            }}
+                                            sx={{ color: '#452C63' }}
+                                        >
+                                            <Delete />
+                                        </IconButton>
+                                    }
                                 >
                                     <ListItemIcon
                                         style={{
@@ -319,7 +360,7 @@ export default function Sidebar({ playlists, setPlaylists, onPlaylistSelect, isA
                             ))}
                         </List>
                     )
-                ) : selectedTab === 'artists' && (
+                ) : selectedTab === 'artists' ? (
                     isArtistsLoading ? (
                         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
                             <CircularProgress style={{ color: '#2F184B' }} />
@@ -357,8 +398,7 @@ export default function Sidebar({ playlists, setPlaylists, onPlaylistSelect, isA
                             ))}
                         </List>
                     )
-                )
-            )}
+                ) : null)}
 
             {isAuthenticated && (
                 <Popover
