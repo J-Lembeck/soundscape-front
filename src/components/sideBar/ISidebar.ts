@@ -9,4 +9,5 @@ export interface SidebarProps {
     onPlaylistSelect: (playlistId: number) => void;
     isAuthenticated: boolean;
     isPlaylistsLoading: boolean;
+    setIsPlaylistsLoading: (value: boolean) => void;
   }

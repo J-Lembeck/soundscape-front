@@ -58,7 +58,7 @@ export default function Menu({searchValue, setSearchValue, fetchSongsFromArtist,
                 padding: '0 10px',
                 minWidth: '250px',
                 width: '50%',
-                maxWidth: '1000px',
+                maxWidth: '500px',
                 height: '55px'
             }}>
                 <InputBase
