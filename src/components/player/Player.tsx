@@ -376,7 +376,7 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong, isAuthenticated 
                         max={duration}
                         onChange={handleSliderChange}
                         onChangeCommitted={handleSliderChangeCommitted}
-                        aria-labelledby="audio-slider"
+                        aria-label="audio-slider"
                         sx={{ 
                             width: 500, 
                             ml: 2, 
@@ -411,7 +411,7 @@ const Player = forwardRef(({ songId, setIsPlaying, currentSong, isAuthenticated 
                     step={0.01}
                     onChange={handleVolumeChange}
                     onChangeCommitted={handleVolumeChangeCommitted}
-                    aria-labelledby="volume-slider"
+                    aria-label="volume-slider"
                     sx={{ 
                         width: 100, 
                         ml: 1, 
