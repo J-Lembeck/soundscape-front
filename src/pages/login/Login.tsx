@@ -9,6 +9,7 @@ import {
     InputAdornment,
     IconButton,
     Paper,
+    InputLabel,
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import api from '../../services/api';
@@ -29,12 +30,6 @@ export default function Login({ setIsAuthenticated }: ILoginProps) {
     };
 
     const handleLogin = async () => {
-        const validationErrors = validateFields();
-        if (Object.keys(validationErrors).length > 0) {
-            setErrors(validationErrors);
-            return;
-        }
-
         try {
             const response = await api.post('/auth/login', { username, password });
             localStorage.setItem('token', response.data.token);
@@ -48,20 +43,6 @@ export default function Login({ setIsAuthenticated }: ILoginProps) {
                 content: 'Usuário ou senha incorretos.',
             });
         }
-    };
-
-    const validateFields = () => {
-        const errors: { [key: string]: string } = {};
-
-        if (!username) {
-            errors.username = 'O nome de usuário é obrigatório.';
-        }
-
-        if (!password) {
-            errors.password = 'A senha é obrigatória.';
-        }
-
-        return errors;
     };
 
     const inputStyle = {
@@ -155,27 +136,20 @@ export default function Login({ setIsAuthenticated }: ILoginProps) {
                         </Typography>
                     </Box>
 
-                    {Object.keys(errors).length > 0 && (
-                        <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
-                            {Object.values(errors).map((err, index) => (
-                                <div key={index}>{err}</div>
-                            ))}
-                        </Alert>
-                    )}
-
                     <Box width="100%">
-                        <Typography
-                            component="label"
+                        <InputLabel
+                            htmlFor="username-input"
                             sx={errors.username ? errorLabelStyle : labelStyle}
                         >
                             Nome de Usuário
-                        </Typography>
+                        </InputLabel>
                         <TextField
+                            id="username-input"
                             fullWidth
                             margin="normal"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
-                            placeholder='Digite seu usuário...'
+                            placeholder="Digite seu usuário..."
                             sx={errors.username ? errorInputStyle : inputStyle}
                             style={{ marginTop: 0 }}
                             variant="outlined"
@@ -183,22 +157,23 @@ export default function Login({ setIsAuthenticated }: ILoginProps) {
                     </Box>
 
                     <Box width="100%">
-                        <Typography
-                            component="label"
+                        <InputLabel
+                            htmlFor="password-input"
                             sx={errors.password ? errorLabelStyle : labelStyle}
                         >
                             Senha
-                        </Typography>
+                        </InputLabel>
                         <TextField
+                            id="password-input"
                             type={showPassword ? 'text' : 'password'}
                             fullWidth
                             margin="normal"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Digite sua senha..."
                             sx={errors.password ? errorInputStyle : inputStyle}
                             style={{ marginTop: 0 }}
                             variant="outlined"
-                            placeholder='Digite sua senha...'
                             InputProps={{
                                 endAdornment: (
                                     <InputAdornment position="end">

@@ -12,9 +12,9 @@ import { useNavigate } from 'react-router-dom';
 const Player = forwardRef(({ songId, setIsPlaying, currentSong, isAuthenticated }: PlayerProps, ref) => {
     const [duration, setDuration] = useState<number>(0);
     const [currentTime, setCurrentTime] = useState<number>(0);
-    const [sliderCurrentTime, setSliderCurrentTime] = useState<number>(0); // Novo estado
+    const [sliderCurrentTime, setSliderCurrentTime] = useState<number>(0);
     const [volume, setVolume] = useState<number>(0.7);
-    const [sliderVolume, setSliderVolume] = useState<number>(0.7); // Novo estado
+    const [sliderVolume, setSliderVolume] = useState<number>(0.7);
     const [isPlaying, setPlaying] = useState<boolean>(false);
     const [imageError, setImageError] = useState(false);
     const [isLiked, setIsLiked] = useState<boolean>(false);
